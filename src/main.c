@@ -2,6 +2,9 @@
 
 #include <libdragon.h>
 
+#include "util.h"
+#include "drawing.h"
+
 struct Vec2
 {
     int x;
@@ -50,7 +53,7 @@ void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t col
 
     for (int i = 0; i < 8; i++) {
         int j = (i + 1) % 8;
-        graphics_draw_line(
+        draw_aa_line(
             ctx, 
             v[i].x + 120, 
             v[i].y + 120, 
@@ -58,11 +61,6 @@ void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t col
             v[j].y + 120,
             color);
     }
-}
-
-int abs(int a)
-{
-    return a > 0 ? a : -a;
 }
 
 void print_stick_angles(display_context_t ctx, struct StickAngles a)
@@ -134,7 +132,7 @@ void test_angles(struct StickAngles *a)
 
 int main(void)
 {
-    display_init(RESOLUTION_320x240, DEPTH_16_BPP, 2, GAMMA_NONE, ANTIALIAS_RESAMPLE);
+    display_init(RESOLUTION_320x240, DEPTH_32_BPP, 2, GAMMA_CORRECT_DITHER, ANTIALIAS_RESAMPLE);
     controller_init();
 
     console_set_debug(true);
@@ -143,8 +141,8 @@ int main(void)
 
     test_angles(&a);
 
-    uint32_t c = graphics_make_color(255, 0, 255, 255);
-    uint32_t c2 = graphics_make_color(0, 0, 255, 255);
+    uint32_t c  = graphics_make_color(0, 64, 255, 255);
+    uint32_t c2 = graphics_make_color(64, 255, 0, 255);
 
     for (;;) {
         display_context_t ctx;
@@ -152,7 +150,7 @@ int main(void)
 
         graphics_fill_screen(ctx, graphics_make_color(0,0,0,255));
 
-        draw_stick_angles(ctx, perfect_hori, c2);
+        draw_stick_angles(ctx, perfect_n64, c2);
         draw_stick_angles(ctx, a, c);
         print_stick_angles(ctx, a);
         display_show(ctx);
