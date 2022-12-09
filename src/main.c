@@ -1,8 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <libdragon.h>
 
-#include "util.h"
 #include "drawing.h"
 
 struct Vec2
@@ -92,30 +92,49 @@ void test_angles(struct StickAngles *a)
 {
     static const char *angles[] =
     {
-        "up",
-        "up-right",
-        "right",
-        "down-right",
-        "down",
-        "down-left",
-        "left",
-        "up-left",
+        "Up",
+        "Up-Right",
+        "Right",
+        "Down-Right",
+        "Down",
+        "Down-Left",
+        "Left",
+        "Up-Left",
+    };
+
+    static const char *gfx[] =
+    {
+        "/gfx/stick_0.sprite", 
+        "/gfx/stick_1.sprite",
+        "/gfx/stick_2.sprite",
+        "/gfx/stick_3.sprite",
+        "/gfx/stick_4.sprite",
+        "/gfx/stick_5.sprite",
+        "/gfx/stick_6.sprite",
+        "/gfx/stick_7.sprite",
     };
 
     struct Vec2 *v = (struct Vec2*)a;
 
     for (int i = 0; i < 8; i++) {
         char buf[128];
-        snprintf(buf, sizeof(buf), "hold %s and press a", angles[i]);
+        snprintf(buf, sizeof(buf), "Hold %s and press A", angles[i]);
         int a_held = 1;
 
-        for (;;) {
-            display_context_t ctx;
-            while ((ctx = display_lock()) == 0) {}
-            graphics_fill_screen(ctx, graphics_make_color(0,0,0,255));
-            graphics_draw_text(ctx, 32, 128, buf);
-            display_show(ctx);
+        int f = dfs_open(gfx[i]);
+        int size = dfs_size(f);
+        sprite_t *stick = malloc(size);
+        dfs_read(stick, size, 1, f);
+        dfs_close(f);
 
+        display_context_t ctx;
+        while ((ctx = display_lock()) == 0) {}
+        graphics_fill_screen(ctx, graphics_make_color(0,0,0,255));
+        graphics_draw_sprite(ctx, (320-128)/2, (240-128)/2, stick);
+        graphics_draw_text(ctx, 32, 24, buf);
+        display_show(ctx);
+
+        for (;;) {
             struct controller_data data;
             controller_read(&data);
             if (data.c[0].A && !a_held) {
@@ -127,17 +146,20 @@ void test_angles(struct StickAngles *a)
                 a_held = 0;
             }
         }
+
+        free(stick);
     }
 }
 
 int main(void)
 {
-    display_init(RESOLUTION_320x240, DEPTH_32_BPP, 2, GAMMA_CORRECT_DITHER, ANTIALIAS_RESAMPLE);
+    display_init(RESOLUTION_320x240, DEPTH_32_BPP, 2, GAMMA_CORRECT, ANTIALIAS_RESAMPLE);
     controller_init();
+    dfs_init(DFS_DEFAULT_LOCATION);
 
     console_set_debug(true);
 
-    struct StickAngles a;
+    struct StickAngles a = perfect_n64;
 
     test_angles(&a);
 

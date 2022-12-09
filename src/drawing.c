@@ -1,11 +1,11 @@
+#include <stdlib.h>
+
 #include "drawing.h"
-#include "util.h"
 
 static inline uint32_t color_alpha(uint32_t c, uint8_t i)
 {
     return (c & 0xFFFFFF00) | i;
 }
-
 
 __attribute__ ((optimize(0))) void draw_aa_line (display_context_t ctx, int x0, int y0, int x1, int y1, uint32_t c)
 {
