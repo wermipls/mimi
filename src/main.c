@@ -55,10 +55,10 @@ void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t col
         int j = (i + 1) % 8;
         draw_aa_line(
             ctx, 
-            v[i].x + 120, 
-            v[i].y + 120, 
-            v[j].x + 120,
-            v[j].y + 120,
+            120 + v[i].x, 
+            120 - v[i].y, 
+            120 + v[j].x,
+            120 - v[j].y,
             color);
     }
 }
