@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include <libdragon.h>
 
@@ -81,30 +82,108 @@ void draw_center_cross(display_context_t ctx)
     }
 }
 
+uint32_t get_range_color_cardinal(int a)
+{
+    if (a >= 80) {
+        return graphics_make_color(0, 255, 64, 255);
+    } else if (a >= 75) {
+        return graphics_make_color(192, 255, 0, 255);
+    } else if (a >= 70) {
+        return graphics_make_color(255, 128, 64, 255);
+    } else {
+        return graphics_make_color(255, 64, 0, 255);
+    }
+}
+
+uint32_t get_range_color_diagonal(int x, int y)
+{
+    float euclidean = sqrtf(x*x + y*y);
+
+    return get_range_color_cardinal(euclidean / 1.125);
+}
+
+uint32_t get_angle_color(float angle)
+{
+
+    float diff = fabsf(45.0f - angle);
+
+    if (diff < 1) {
+        return graphics_make_color(0, 255, 64, 255);
+    } else if (diff < 2) {
+        return graphics_make_color(192, 255, 0, 255);
+    } else if (diff < 3) {
+        return graphics_make_color(255, 128, 64, 255);
+    } else {
+        return graphics_make_color(255, 64, 0, 255);
+    }
+}
+
 void print_stick_angles(display_context_t ctx, struct StickAngles a)
 {
     char buf[1024];
     snprintf(buf, sizeof(buf),
-        "%3d up   \n"
-        "%3d down \n"
-        "%3d left \n" 
-        "%3d right\n\n"
-        "%3d ur   \n"
-        "%3d      \n\n"
-        "%3d ul   \n"
-        "%3d      \n\n"
-        "%3d dr   \n"
-        "%3d      \n\n"
-        "%3d dl   \n"
-        "%3d      \n\n",
-        abs(a.u.y), abs(a.d.y), abs(a.l.x), abs(a.r.x),
+        "up   \n"
+        "down \n"
+        "left \n" 
+        "right\n\n"
+        "UR\n\n\n"
+        "UL\n\n\n"
+        "DR\n\n\n"
+        "DL"
+    );
+
+    int y = 15;
+
+    graphics_set_color(graphics_make_color(255,255,255,255), 0);
+
+    text_set_font(FONT_MEDIUM);
+    text_draw(ctx, 270, y, buf, ALIGN_LEFT);
+
+    text_set_font(FONT_BOLD);
+    int cardinals[] = {abs(a.u.y), abs(a.d.y), abs(a.l.x), abs(a.r.x)};
+
+    for (int i = 0; i < 4; i++) {
+        snprintf(buf, sizeof(buf), "%3d", cardinals[i]);
+        uint32_t c = get_range_color_cardinal(cardinals[i]);
+        graphics_set_color(c, 0);
+        text_draw(ctx, 263, y, buf, ALIGN_RIGHT);
+        y += 10;
+    }
+
+    int diagonals[] = {
         abs(a.ur.x), abs(a.ur.y),
         abs(a.ul.x), abs(a.ul.y),
         abs(a.dr.x), abs(a.dr.y),
-        abs(a.dl.x), abs(a.dl.y));
+        abs(a.dl.x), abs(a.dl.y),
+    };
 
+    y += 10;
+
+    for (int i = 0; i < 8; i += 2) {
+        snprintf(buf, sizeof(buf), "%3d\n%3d", diagonals[i], diagonals[i+1]);
+        uint32_t c = get_range_color_diagonal(diagonals[i], diagonals[i+1]);
+        graphics_set_color(c, 0);
+        text_draw(ctx, 263, y, buf, ALIGN_RIGHT);
+        y += 30;
+    }
+
+    float angles[] = {
+        get_angle(abs(a.ur.x), abs(a.ur.y)),
+        get_angle(abs(a.ul.x), abs(a.ul.y)),
+        get_angle(abs(a.dr.x), abs(a.dr.y)),
+        get_angle(abs(a.dl.x), abs(a.dl.y)),
+    };
+
+    y = 15 + 60;
     text_set_font(FONT_MEDIUM);
-    text_draw(ctx, 240, 16, buf, ALIGN_LEFT);
+
+    for (int i = 0; i < 4; i++) {
+        snprintf(buf, sizeof(buf), "%2.1f deg", angles[i]);
+        uint32_t c = get_angle_color(angles[i]);
+        graphics_set_color(c, 0);
+        text_draw(ctx, 270, y, buf, ALIGN_LEFT);
+        y += 30;
+    }
 }
 
 void test_angles(struct StickAngles *a)
