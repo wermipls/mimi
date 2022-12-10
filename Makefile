@@ -2,7 +2,7 @@ V=1
 SOURCE_DIR=src
 BUILD_DIR=build
 include $(N64_INST)/include/n64.mk
-ROM_VERSION=$(shell git describe --always --dirty --match 'NOT A TAG')
+ROM_VERSION=$(shell git describe --always --match 'NOT A TAG')
 NAME=mimi-$(ROM_VERSION)
 ROMNAME=$(NAME).z64
 FS=$(BUILD_DIR)/data.dfs
