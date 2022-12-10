@@ -4,6 +4,7 @@
 #include <libdragon.h>
 
 #include "drawing.h"
+#include "text.h"
 
 struct Vec2
 {
@@ -67,10 +68,10 @@ void print_stick_angles(display_context_t ctx, struct StickAngles a)
 {
     char buf[1024];
     snprintf(buf, sizeof(buf),
-        "%3d up   \n\n"
-        "%3d down \n\n"
-        "%3d left \n\n" 
-        "%3d right\n\n\n\n"
+        "%3d up   \n"
+        "%3d down \n"
+        "%3d left \n" 
+        "%3d right\n\n"
         "%3d ur   \n"
         "%3d      \n\n"
         "%3d ul   \n"
@@ -85,7 +86,7 @@ void print_stick_angles(display_context_t ctx, struct StickAngles a)
         abs(a.dr.x), abs(a.dr.y),
         abs(a.dl.x), abs(a.dl.y));
 
-    graphics_draw_text(ctx, 240, 16, buf);
+    text_draw(ctx, 240, 16, buf, ALIGN_LEFT);
 }
 
 void test_angles(struct StickAngles *a)
@@ -131,7 +132,7 @@ void test_angles(struct StickAngles *a)
         while ((ctx = display_lock()) == 0) {}
         graphics_fill_screen(ctx, graphics_make_color(0,0,0,255));
         graphics_draw_sprite(ctx, (320-128)/2, (240-128)/2, stick);
-        graphics_draw_text(ctx, 32, 24, buf);
+        text_draw(ctx, 32, 24, buf, ALIGN_LEFT);
         display_show(ctx);
 
         for (;;) {
@@ -156,6 +157,8 @@ int main(void)
     display_init(RESOLUTION_320x240, DEPTH_32_BPP, 2, GAMMA_CORRECT, ANTIALIAS_RESAMPLE);
     controller_init();
     dfs_init(DFS_DEFAULT_LOCATION);
+
+    text_init();
 
     console_set_debug(true);
 

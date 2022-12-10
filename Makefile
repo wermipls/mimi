@@ -10,7 +10,7 @@ FS=$(BUILD_DIR)/data.dfs
 all: $(ROMNAME)
 .PHONY: all
 
-OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/drawing.o
+OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/drawing.o $(BUILD_DIR)/text.o
 
 $(ROMNAME): N64_ROM_TITLE="mimi controller test"
 $(ROMNAME): $(FS)
