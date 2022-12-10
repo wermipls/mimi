@@ -7,6 +7,9 @@
 #include "drawing.h"
 #include "text.h"
 #include "util.h"
+#include "input.h"
+
+#define REPO_URL "github.com/wermipls/mimi"
 
 struct Vec2
 {
@@ -49,6 +52,32 @@ struct StickAngles perfect_hori =
     {-100, 0 },
     {-75, 75},
 };
+
+enum Comparison
+{
+    COMP_NONE,
+    COMP_N64,
+    COMP_HORI,
+
+    COMP_MAX,
+};
+
+struct StickAngles *comparisons[] =
+{
+    NULL,
+    &perfect_n64,
+    &perfect_hori,
+};
+
+const char *comparison_names[] =
+{
+    "Benchmark results",
+    "Perfect N64 OEM comparison",
+    "Perfect Horipad Mini comparison",
+};
+
+uint32_t color_foreground;
+uint32_t color_background;
 
 void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t color)
 {
@@ -134,7 +163,7 @@ void print_stick_angles(display_context_t ctx, struct StickAngles a)
 
     int y = 15;
 
-    graphics_set_color(graphics_make_color(255,255,255,255), 0);
+    graphics_set_color(color_foreground, 0);
 
     text_set_font(FONT_MEDIUM);
     text_draw(ctx, 270, y, buf, ALIGN_LEFT);
@@ -214,6 +243,7 @@ void test_angles(struct StickAngles *a)
 
     struct Vec2 *v = (struct Vec2*)a;
 
+    graphics_set_color(color_foreground, 0);
     text_set_font(FONT_BOLD);
 
     for (int i = 0; i < 8; i++) {
@@ -229,7 +259,7 @@ void test_angles(struct StickAngles *a)
 
         display_context_t ctx;
         while ((ctx = display_lock()) == 0) {}
-        graphics_fill_screen(ctx, graphics_make_color(0,0,0,255));
+        graphics_fill_screen(ctx, color_background);
         graphics_draw_sprite(ctx, (320-128)/2, (240-128)/2, stick);
         text_draw(ctx, 320/2, 32, buf, ALIGN_CENTER);
         display_show(ctx);
@@ -251,6 +281,12 @@ void test_angles(struct StickAngles *a)
     }
 }
 
+enum Screen
+{
+    SCR_RANGE_TEST,
+    SCR_RANGE_RESULT,
+};
+
 int main(void)
 {
     display_init(RESOLUTION_320x240, DEPTH_32_BPP, 2, GAMMA_NONE, ANTIALIAS_RESAMPLE);
@@ -261,23 +297,66 @@ int main(void)
 
     console_set_debug(true);
 
-    struct StickAngles a = perfect_n64;
+    color_foreground = graphics_make_color(255, 255, 255, 255);
+    color_background = graphics_make_color(0, 0, 0, 255);
 
-    test_angles(&a);
+    enum Screen current_screen = 0;
 
+    struct StickAngles result;
     uint32_t c  = graphics_make_color(0, 64, 255, 255);
     uint32_t c2 = graphics_make_color(64, 255, 0, 255);
 
     for (;;) {
-        display_context_t ctx;
-        while ((ctx = display_lock()) == 0) {}
+        switch (current_screen)
+        {
+        case SCR_RANGE_TEST:
+            test_angles(&result);
+            current_screen = SCR_RANGE_RESULT;
+            break;
+        case SCR_RANGE_RESULT: ;
+            static enum Comparison current_comparison = COMP_NONE;
 
-        graphics_fill_screen(ctx, graphics_make_color(0,0,0,255));
+            display_context_t ctx;
+            while ((ctx = display_lock()) == 0) {}
 
-        draw_center_cross(ctx);
-        draw_stick_angles(ctx, perfect_n64, c2);
-        draw_stick_angles(ctx, a, c);
-        print_stick_angles(ctx, a);
-        display_show(ctx);
+            graphics_fill_screen(ctx, color_background);
+
+            draw_center_cross(ctx);
+            if (comparisons[current_comparison]) {
+                draw_stick_angles(ctx, *comparisons[current_comparison], c2);
+            }
+            draw_stick_angles(ctx, result, c);
+            print_stick_angles(ctx, result);
+
+            text_set_font(FONT_BOLD);
+            graphics_set_color(color_foreground, 0);
+            text_draw(ctx, 120, 15, comparison_names[current_comparison], ALIGN_CENTER);
+
+            text_set_font(FONT_MEDIUM);
+            graphics_set_color(graphics_make_color(128, 128, 128, 255), 0);
+            text_draw(ctx, 320 - 16, 213, REPO_URL, ALIGN_RIGHT);
+
+            display_show(ctx);
+
+            struct controller_data cdata;
+            input_read_pressed(&cdata);
+            if (cdata.c[0].start) {
+                current_screen = SCR_RANGE_TEST;
+            }
+
+            if (cdata.c[0].L) {
+                if (current_comparison == 0) {
+                    current_comparison = COMP_MAX - 1;
+                } else {
+                    current_comparison--;
+                }
+            } else if (cdata.c[0].R) {
+                current_comparison++;
+                if (current_comparison >= COMP_MAX) {
+                    current_comparison = 0;
+                }
+            }
+            break;
+        }
     }
 }
