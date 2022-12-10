@@ -1,5 +1,7 @@
 #pragma once
 
+#include <math.h>
+
 static inline int smin(int a, int b)
 {
     return a > b ? b : a;

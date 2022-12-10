@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "drawing.h"
+#include "util.h"
 
 static inline uint32_t color_alpha(uint32_t c, uint8_t i)
 {
@@ -33,6 +34,11 @@ static inline uint8_t gammac(int i)
 
 __attribute__ ((optimize(0))) void draw_aa_line (display_context_t ctx, int x0, int y0, int x1, int y1, uint32_t c)
 {
+    x0 = smax(smin(x0, 319), 0);
+    x1 = smax(smin(x1, 319), 0);
+    y0 = smax(smin(y0, 239), 0);
+    y1 = smax(smin(y1, 239), 0);
+
     if (x0 == x1 || y0 == y1) {
         graphics_draw_line(ctx, x0, y0, x1, y1, c);
         return;
