@@ -157,7 +157,7 @@ void test_angles(struct StickAngles *a)
 
 int main(void)
 {
-    display_init(RESOLUTION_320x240, DEPTH_32_BPP, 2, GAMMA_CORRECT, ANTIALIAS_RESAMPLE);
+    display_init(RESOLUTION_320x240, DEPTH_32_BPP, 2, GAMMA_NONE, ANTIALIAS_RESAMPLE);
     controller_init();
     dfs_init(DFS_DEFAULT_LOCATION);
 
