@@ -5,6 +5,7 @@
 
 #include "drawing.h"
 #include "text.h"
+#include "util.h"
 
 struct Vec2
 {
@@ -61,6 +62,22 @@ void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t col
             120 + v[j].x,
             120 - v[j].y,
             color);
+    }
+}
+
+void draw_center_cross(display_context_t ctx)
+{
+    int x, y;
+    y = 120;
+    for (x = 0; x < 240; x++) {
+        int i = smin(240 - abs(240 - x * 2), 120);
+        graphics_draw_pixel_trans(ctx, x, y, graphics_make_color(255, 255, 255, i));
+    }
+
+    x = 120;
+    for (y = 0; y < 240; y++) {
+        int i = smin(240 - abs(240 - y * 2), 120);
+        graphics_draw_pixel_trans(ctx, x, y, graphics_make_color(255, 255, 255, i));
     }
 }
 
@@ -178,6 +195,7 @@ int main(void)
 
         graphics_fill_screen(ctx, graphics_make_color(0,0,0,255));
 
+        draw_center_cross(ctx);
         draw_stick_angles(ctx, perfect_n64, c2);
         draw_stick_angles(ctx, a, c);
         print_stick_angles(ctx, a);
