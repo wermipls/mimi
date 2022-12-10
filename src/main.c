@@ -86,6 +86,7 @@ void print_stick_angles(display_context_t ctx, struct StickAngles a)
         abs(a.dr.x), abs(a.dr.y),
         abs(a.dl.x), abs(a.dl.y));
 
+    text_set_font(FONT_MEDIUM);
     text_draw(ctx, 240, 16, buf, ALIGN_LEFT);
 }
 
@@ -117,6 +118,8 @@ void test_angles(struct StickAngles *a)
 
     struct Vec2 *v = (struct Vec2*)a;
 
+    text_set_font(FONT_BOLD);
+
     for (int i = 0; i < 8; i++) {
         char buf[128];
         snprintf(buf, sizeof(buf), "Hold %s and press A", angles[i]);
@@ -132,7 +135,7 @@ void test_angles(struct StickAngles *a)
         while ((ctx = display_lock()) == 0) {}
         graphics_fill_screen(ctx, graphics_make_color(0,0,0,255));
         graphics_draw_sprite(ctx, (320-128)/2, (240-128)/2, stick);
-        text_draw(ctx, 32, 24, buf, ALIGN_LEFT);
+        text_draw(ctx, 320/2, 32, buf, ALIGN_CENTER);
         display_show(ctx);
 
         for (;;) {

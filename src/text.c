@@ -40,14 +40,26 @@ void text_set_font(enum Font f)
 
 int text_get_line_width(const char s[])
 {
-    return 0;
+    int w = 0;
+    for (; *s != 0 && *s != '\n'; s++) {
+        w += fonts[current_font].char_widths[(int)*s];
+    }
+
+    return w;
 }
 
 void text_draw(display_context_t ctx, int x, int y, const char s[], enum TextAlign align)
 {
     int x_init = x;
 
-    if (align != ALIGN_LEFT) return; // TODO implement this
+reposition:
+    int w = text_get_line_width(s);
+    if (align == ALIGN_RIGHT) {
+        x -= w;
+    }
+    if (align == ALIGN_CENTER) {
+        x -= w / 2;
+    }
 
     for (; *s != 0; s++) {
         switch (*s)
@@ -55,6 +67,8 @@ void text_draw(display_context_t ctx, int x, int y, const char s[], enum TextAli
         case '\n':
             x = x_init;
             y += 10;
+            s++;
+            goto reposition;
             break;
         case ' ':
             x += fonts[current_font].char_widths[(int)*s];
