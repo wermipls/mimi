@@ -1,4 +1,4 @@
 build/
 .tmp/
 *.z64
-*.sprite
+fs/gfx/*.sprite
