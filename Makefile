@@ -16,7 +16,7 @@ $(ROMNAME): N64_ROM_TITLE="mimi controller test"
 $(ROMNAME): $(FS)
 
 $(FS): $(wildcard fs/*) $(wildcard gfx/*)
-	mkdir fs/gfx/
+	mkdir -p fs/gfx/
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_0.png fs/gfx/stick_0.sprite
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_1.png fs/gfx/stick_1.sprite
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_2.png fs/gfx/stick_2.sprite
