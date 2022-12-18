@@ -32,7 +32,7 @@ static inline uint8_t gammac(int i)
     return gamma_lut[i];
 }
 
-__attribute__ ((optimize(0))) void draw_aa_line (display_context_t ctx, int x0, int y0, int x1, int y1, uint32_t c)
+void draw_aa_line (display_context_t ctx, int x0, int y0, int x1, int y1, uint32_t c)
 {
     x0 = smax(smin(x0, 319), 0);
     x1 = smax(smin(x1, 319), 0);
