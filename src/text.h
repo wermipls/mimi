@@ -2,6 +2,8 @@
 
 #include <libdragon.h>
 
+#define SYMBOL_DEGREES "\x1f"
+
 enum Font
 {
     FONT_MEDIUM = 0,
