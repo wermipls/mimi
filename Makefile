@@ -14,7 +14,8 @@ N64_CFLAGS += -DREPO_URL=\""$(REPO_URL)"\"
 all: $(ROMNAME)
 .PHONY: all
 
-OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/drawing.o $(BUILD_DIR)/text.o $(BUILD_DIR)/input.o
+SRCS = $(wildcard $(SOURCE_DIR)/*.c)
+OBJS = $(SRCS:$(SOURCE_DIR)/%.c=$(BUILD_DIR)/%.o)
 
 $(ROMNAME): N64_ROM_TITLE="mimi controller test"
 $(ROMNAME): $(FS)
