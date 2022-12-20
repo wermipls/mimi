@@ -207,7 +207,7 @@ void print_stick_angles(display_context_t ctx, struct StickAngles a)
     text_set_font(FONT_MEDIUM);
 
     for (int i = 0; i < 4; i++) {
-        snprintf(buf, sizeof(buf), "%2.1f deg", angles[i]);
+        snprintf(buf, sizeof(buf), "%2.1f" SYMBOL_DEGREES, angles[i]);
         uint32_t c = get_angle_color(angles[i]);
         graphics_set_color(c, 0);
         text_draw(ctx, 270, y, buf, ALIGN_LEFT);
