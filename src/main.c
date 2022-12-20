@@ -9,14 +9,6 @@
 #include "util.h"
 #include "input.h"
 
-#define REPO_URL "github.com/wermipls/mimi"
-
-struct Vec2
-{
-    int x;
-    int y;
-};
-
 struct StickAngles
 {
     struct Vec2 u;

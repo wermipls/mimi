@@ -5,7 +5,11 @@ include $(N64_INST)/include/n64.mk
 ROM_VERSION=$(shell git describe --always --match 'NOT A TAG')
 NAME=mimi-$(ROM_VERSION)
 ROMNAME=$(NAME).z64
+REPO_URL=github.com/wermipls/mimi
 FS=$(BUILD_DIR)/data.dfs
+
+N64_CFLAGS += -DROM_VERSION=\""$(ROM_VERSION)"\"
+N64_CFLAGS += -DREPO_URL=\""$(REPO_URL)"\"
 
 all: $(ROMNAME)
 .PHONY: all
