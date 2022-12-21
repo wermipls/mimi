@@ -12,26 +12,30 @@
 
 struct StickAngles perfect_n64 =
 {
-    { 0,  85},
-    { 70, 70},
-    { 85, 0 },
-    { 70,-70},
-    { 0, -85},
-    {-70,-70},
-    {-85, 0 },
-    {-70, 70},
+    .values = {
+      0,  85,
+      70, 70,
+      85, 0 ,
+      70,-70,
+      0, -85,
+     -70,-70,
+     -85, 0 ,
+     -70, 70
+    }
 };
 
 struct StickAngles perfect_hori =
 {
-    { 0,  100},
-    { 75, 75},
-    { 100, 0 },
-    { 75,-75},
-    { 0, -100},
-    {-75,-75},
-    {-100, 0 },
-    {-75, 75},
+    .values = {
+      0,  100,
+      75, 75,
+      100,0,
+      75,-75,
+      0, -100,
+     -75,-75,
+     -100,0,
+     -75, 75
+    }
 };
 
 enum Comparison
@@ -259,13 +263,51 @@ void test_angles(struct StickAngles *a)
     }
 }
 
+struct StickAngles find_median(struct StickAngles a[], int n)
+{
+    struct StickAngles median;
+
+    for (int i = 0; i < 16; i++) {
+        int sorted[n];
+
+        for (int j = 0; j < n; j++) {
+            sorted[j] = a[j].values[i];
+        }
+
+        for (int j = 0; j < n; j++) {
+            int lowest_idx = j;
+
+            for (int k = j; k < n; k++) {
+                if (sorted[k] < sorted[lowest_idx]) {
+                    lowest_idx = k;
+                }
+            }
+
+            int tmp = sorted[j];
+            sorted[j] = sorted[lowest_idx];
+            sorted[lowest_idx] = tmp;
+        }
+
+        if (n % 2) {
+            median.values[i] = sorted[(n-1)/2];
+        } else {
+            median.values[i] = (sorted[n/2-1] + sorted[n/2]) / 2;
+        }
+    }
+
+    return median;
+}
+
 void display_angles(struct StickAngles a[], int sample_count)
 {
     static enum Comparison current_comparison = COMP_NONE;
     display_context_t ctx;
 
-    uint32_t c  = graphics_make_color(0, 64, 255, 255);
+    uint32_t c  = graphics_make_color(0, 192, 255, 255);
     uint32_t c2 = graphics_make_color(64, 255, 0, 255);
+    uint32_t c3 = graphics_make_color(0, 0, 255, 255);
+
+    struct StickAngles median = find_median(a, sample_count);
 
     for (;;) {
         while ((ctx = display_lock()) == 0) {}
@@ -276,7 +318,10 @@ void display_angles(struct StickAngles a[], int sample_count)
         if (comparisons[current_comparison]) {
             draw_stick_angles(ctx, *comparisons[current_comparison], c2);
         }
-        draw_stick_angles(ctx, *a, c);
+        for (int i = 0; i < sample_count; i++) {
+            draw_stick_angles(ctx, a[i], c3);
+        }
+        draw_stick_angles(ctx, median, c);
         print_stick_angles(ctx, *a);
 
         text_set_font(FONT_BOLD);
