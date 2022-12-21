@@ -15,4 +15,4 @@ struct StickAngles
 };
 
 void test_angles(struct StickAngles *a);
-void display_angles(struct StickAngles *a);
+void display_angles(struct StickAngles a[], int sample_count);

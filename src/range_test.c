@@ -259,7 +259,7 @@ void test_angles(struct StickAngles *a)
     }
 }
 
-void display_angles(struct StickAngles *a)
+void display_angles(struct StickAngles a[], int sample_count)
 {
     static enum Comparison current_comparison = COMP_NONE;
     display_context_t ctx;
