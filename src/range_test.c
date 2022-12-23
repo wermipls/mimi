@@ -8,7 +8,6 @@
 #include "drawing.h"
 #include "text.h"
 #include "util.h"
-#include "input.h"
 
 struct StickAngles perfect_n64 =
 {
@@ -300,7 +299,7 @@ struct StickAngles find_median(struct StickAngles a[], int n)
 
 void display_angles(struct StickAngles a[], int sample_count)
 {
-    static enum Comparison current_comparison = COMP_NONE;
+    enum Comparison current_comparison = COMP_NONE;
     display_context_t ctx;
 
     uint32_t c  = graphics_make_color(0, 192, 255, 255);
@@ -322,7 +321,7 @@ void display_angles(struct StickAngles a[], int sample_count)
             draw_stick_angles(ctx, a[i], c3);
         }
         draw_stick_angles(ctx, median, c);
-        print_stick_angles(ctx, *a);
+        print_stick_angles(ctx, median);
 
         text_set_font(FONT_BOLD);
         graphics_set_color(COLOR_FOREGROUND, 0);
@@ -334,8 +333,8 @@ void display_angles(struct StickAngles a[], int sample_count)
 
         display_show(ctx);
 
-        struct controller_data cdata;
-        input_read_pressed(&cdata);
+        controller_scan();
+        struct controller_data cdata = get_keys_down();
         if (cdata.c[0].start) {
             return;
         }

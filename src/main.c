@@ -2,7 +2,6 @@
 
 #include "range_test.h"
 #include "text.h"
-#include "input.h"
 #include "colors.h"
 
 enum Screen
@@ -65,8 +64,8 @@ int main(void)
 
                 display_show(ctx);
 
-                struct controller_data cdata;
-                input_read_pressed(&cdata);
+                controller_scan();
+                struct controller_data cdata = get_keys_down();
 
                 if (cdata.c[0].A) {
                     switch (menu_selection)
