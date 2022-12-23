@@ -45,8 +45,8 @@ int main(void)
 
                 static const char *options[] = {
                     "Range test (1 sample)",
+                    "Range test (3 samples)",
                     "Range test (5 samples)",
-                    "Range test (9 samples)",
                     "About",
                     "Quit",
                 };
@@ -76,11 +76,11 @@ int main(void)
                         current_screen = SCR_RANGE_TEST;
                         break;
                     case 1:
-                        sample_count = 5;
+                        sample_count = 3;
                         current_screen = SCR_RANGE_TEST;
                         break;
                     case 2:
-                        sample_count = 9;
+                        sample_count = 5;
                         current_screen = SCR_RANGE_TEST;
                         break;
                     }
