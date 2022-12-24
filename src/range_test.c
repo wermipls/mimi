@@ -55,9 +55,9 @@ struct StickAngles *comparisons[] =
 
 const char *comparison_names[] =
 {
-    "Benchmark results",
-    "Perfect N64 OEM comparison",
-    "Perfect Horipad Mini comparison",
+    " benchmark result",
+    ", ideal N64 OEM comparison",
+    ", ideal Horipad Mini comparison",
 };
 
 void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t color)
@@ -336,6 +336,7 @@ void display_angles(struct StickAngles a[], int sample_count)
 {
     enum Comparison current_comparison = COMP_NONE;
     display_context_t ctx;
+    int current_measurement = 0;
 
     uint32_t c  = graphics_make_color(0, 192, 255, 255);
     uint32_t c2 = graphics_make_color(64, 255, 0, 255);
@@ -355,13 +356,21 @@ void display_angles(struct StickAngles a[], int sample_count)
         for (int i = 0; i < sample_count; i++) {
             draw_stick_angles(ctx, a[i], c3);
         }
-        draw_stick_angles(ctx, median, c);
-        print_stick_angles(ctx, median);
+
+        struct StickAngles *current;
+        if (current_measurement > 0) {
+            current = &a[current_measurement - 1];
+        } else {
+            current = &median;
+        }
+
+        draw_stick_angles(ctx, *current, c);
+        print_stick_angles(ctx, *current);
         
         graphics_set_color(COLOR_FOREGROUND, 0);
         int y = 15 + 10*17;
 
-        char buf[32];
+        char buf[128];
         snprintf(buf, sizeof(buf), "%d", sample_count);
         text_set_font(FONT_BOLD);
         text_draw(ctx, 263, y, buf, ALIGN_RIGHT);
@@ -385,9 +394,14 @@ void display_angles(struct StickAngles a[], int sample_count)
             text_draw(ctx, 270, y, "std dev", ALIGN_LEFT);
         }
 
-        text_set_font(FONT_BOLD);
-        graphics_set_color(COLOR_FOREGROUND, 0);
-        text_draw(ctx, 120, 15, comparison_names[current_comparison], ALIGN_CENTER);
+        if (current_measurement > 0) {
+            snprintf(buf, sizeof(buf), "Test %d%s",
+                current_measurement, comparison_names[current_comparison]);
+        } else {
+            snprintf(buf, sizeof(buf), "Median%s",
+                comparison_names[current_comparison]);
+        }
+        text_draw(ctx, 120, 15, buf, ALIGN_CENTER);
 
         text_set_font(FONT_MEDIUM);
         graphics_set_color(graphics_make_color(128, 128, 128, 255), 0);
@@ -413,6 +427,18 @@ void display_angles(struct StickAngles a[], int sample_count)
                 current_comparison = 0;
             }
         }
+
+        if (cdata.c[0].up) {
+            if (current_measurement <= 0) {
+                current_measurement = sample_count;
+            } else {
+                current_measurement--;
+            }
+        } else if (cdata.c[0].down) {
+            current_measurement++;
+            if (current_measurement > sample_count) {
+                current_measurement = 0;
+            }
+        }
     }
-    
 }

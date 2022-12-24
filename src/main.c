@@ -1,4 +1,6 @@
 #include <libdragon.h>
+#include <exception.h>
+#include <stdlib.h>
 
 #include "range_test.h"
 #include "text.h"
@@ -13,6 +15,16 @@ enum Screen
     SCR_RANGE_RESULT,
 };
 
+void reset_handler(exception_t *ex)
+{
+    if (ex->type != EXCEPTION_TYPE_RESET) {
+        exception_default_handler(ex);
+        return;
+    }
+
+    abort();
+}
+
 int main(void)
 {
     display_init(RESOLUTION_320x240, DEPTH_32_BPP, 2, GAMMA_NONE, ANTIALIAS_RESAMPLE);
@@ -22,6 +34,7 @@ int main(void)
     text_init();
 
     console_set_debug(true);
+    register_exception_handler(reset_handler);
 
     enum Screen current_screen = 0;
 
@@ -123,7 +136,7 @@ int main(void)
 
                 text_set_font(FONT_MEDIUM);
 
-                text_draw_wordwrap(ctx, 32, 52, 320-64, 
+                text_draw_wordwrap(ctx, 32, 44, 320-64, 
                     "mimi controller test ROM by wermi\n"
                     "version " ROM_VERSION ", built on " __DATE__ "\n\n"
                     REPO_URL "\n\n"
