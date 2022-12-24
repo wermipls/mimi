@@ -48,6 +48,7 @@ int main(void)
         case SCR_MAIN_MENU:
             static int menu_selection = 0;
 
+            text_set_line_height(11);
             for (;;) {
                 while ((ctx = display_lock()) == 0) {}
 
@@ -126,6 +127,7 @@ int main(void)
             }
             break;
         case SCR_ABOUT:
+            text_set_line_height(11);
             for (;;) {
                 while ((ctx = display_lock()) == 0) {}
 
@@ -170,6 +172,7 @@ int main(void)
             const int pages = sizeof(page_names) / sizeof(char*);
             int page = 0;
 
+            text_set_line_height(11);
             for (;;) {
                 while ((ctx = display_lock()) == 0) {}
 
@@ -192,18 +195,28 @@ int main(void)
                 switch (page) 
                 {
                 case 0:
-                    text_draw_wordwrap(ctx, 32, 44, 320-64,
-                        "In the main menu:\n"
+                    text_set_font(FONT_MEDIUM);
+                    text_draw(ctx, 32, 44 + 11*0,
+                        "* D-Pad Left/Right or L/R - change page\n"
+                        "* A/B - return to main menu", ALIGN_LEFT);
+                    text_set_font(FONT_BOLD);
+                    text_draw(ctx, 32, 44 + 11*3,
+                        "In the main menu:", ALIGN_LEFT);
+                    text_set_font(FONT_MEDIUM);
+                    text_draw(ctx, 32, 44 + 11*4,
                         "* D-Pad - select option\n"
-                        "* A - confirm selection\n\n"
-                        "On the range test result screen:\n"
+                        "* A - confirm selection\n", ALIGN_LEFT);
+                    text_set_font(FONT_BOLD);
+                    text_draw(ctx, 32, 44 + 11*7,
+                        "On the range test result screen:", ALIGN_LEFT);
+                    text_set_font(FONT_MEDIUM);
+                    text_draw(ctx, 32, 44 + 11*8,
                         "* L/R - switch between range comparisons\n"
-                        "* D-Pad Up/Down - switch between measurements "
-                        "(either median values or one of the individual "
-                        "measurements)\n"
+                        "* D-Pad Up/Down - switch between measurements\n"
+                        "* D-Pad Left/Right - switch between\n"
+                        "  example ranges and result measurements\n"
                         "* Z - change zoom\n"
-                        "* Start - return to main menu"
-                    );
+                        "* Start - return to main menu\n", ALIGN_LEFT);
                     break;
                 case 1:
                     text_draw_wordwrap(ctx, 32, 44, 320-64,
@@ -223,6 +236,19 @@ int main(void)
                     break;
                 case 2:
                     text_draw_wordwrap(ctx, 32, 44, 320-64,
+                        "The measurement display can also be overriden with "
+                        "one of the example ones, to let user view the expected "
+                        "values and angles.\n\n"
+
+                        "Some particularly bad controllers can have overly "
+                        "high range, which would not fit the screen. Zoom "
+                        "will be automatically changed to 75\% to compensate "
+                        "in those cases, but the setting can be manually "
+                        "overriden by user."
+                    );
+                    break;
+                case 3:
+                    text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "Absolute analog values for each notch are displayed "
                         "on the right of the screen, as well as angles "
                         "for each diagonal. The values have colors assigned "
@@ -235,15 +261,6 @@ int main(void)
                         "The diagonal magnitude cutoffs are 9/8th times "
                         "the cardinal ones to compensate for higher "
                         "magnitude diagonals on original N64 controllers."
-                    );
-                    break;
-                case 3:
-                    text_draw_wordwrap(ctx, 32, 44, 320-64,
-                        "Some particularly bad controllers can have overly "
-                        "high range, which would not fit the screen. Zoom "
-                        "will be automatically changed to 75\% to compensate "
-                        "in those cases, but the setting can be manually "
-                        "overriden by user.\n\n"
                     );
                     break;
                 }

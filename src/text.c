@@ -10,6 +10,7 @@ struct FontData
 
 struct FontData fonts[2];
 enum Font current_font = 0;
+int line_height = 10;
 
 void load_font(struct FontData *fontdata, const char sprite_path[], const char charwidth_path[])
 {
@@ -30,12 +31,18 @@ void text_init()
     load_font(&fonts[FONT_MEDIUM], "font/medium.sprite", "font/medium_charwidths.bin");
     load_font(&fonts[FONT_BOLD], "font/bold.sprite", "font/bold_charwidths.bin");
     text_set_font(FONT_MEDIUM);
+    text_set_line_height(11);
 }
 
 void text_set_font(enum Font f)
 {
     current_font = f;
     graphics_set_font_sprite(fonts[f].sprite);
+}
+
+void text_set_line_height(int h)
+{
+    line_height = h;
 }
 
 int text_get_line_width(const char s[])
@@ -66,7 +73,7 @@ reposition:
         {
         case '\n':
             x = x_init;
-            y += 10;
+            y += line_height;
             s++;
             goto reposition;
             break;
@@ -137,6 +144,6 @@ void text_draw_wordwrap(display_context_t ctx, int x, int y, int w, const char s
         }
 
         x = x_init;
-        y += 11;
+        y += line_height;
     }
 }

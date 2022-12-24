@@ -371,6 +371,7 @@ void display_angles(struct StickAngles a[], int sample_count)
     struct StickAngles median = find_median(a, sample_count);
     int zoomout = should_enable_zoomout(a, sample_count);
 
+    text_set_line_height(10);
     for (;;) {
         while ((ctx = display_lock()) == 0) {}
 
