@@ -394,6 +394,9 @@ void display_angles(struct StickAngles a[], int sample_count)
             text_draw(ctx, 270, y, "std dev", ALIGN_LEFT);
         }
 
+        if (sample_count == 1) {
+            current_measurement = 1;
+        } 
         if (current_measurement > 0) {
             snprintf(buf, sizeof(buf), "Test %d%s",
                 current_measurement, comparison_names[current_comparison]);

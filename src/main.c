@@ -40,7 +40,7 @@ int main(void)
 
     struct StickAngles result[9];
     display_context_t ctx;
-    int sample_count = 1;
+    int sample_count = -1;
 
     for (;;) {
         switch (current_screen)
@@ -99,7 +99,9 @@ int main(void)
                         current_screen = SCR_RANGE_TEST;
                         break;
                     case 3:
-                        current_screen = SCR_RANGE_RESULT;
+                        if (sample_count > 0) {
+                            current_screen = SCR_RANGE_RESULT;
+                        }
                         break;
                     case 4:
                         current_screen = SCR_HELP;
