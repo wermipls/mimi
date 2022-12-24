@@ -204,8 +204,11 @@ void print_stick_angles(display_context_t ctx, struct StickAngles a)
 
 void test_angles(struct StickAngles *a)
 {
+    const int reset_cmd = 0xFF;
+
     static const char *angles[] =
     {
+        "Neutral",
         "Up",
         "Up-Right",
         "Right",
@@ -218,6 +221,7 @@ void test_angles(struct StickAngles *a)
 
     static const char *gfx[] =
     {
+        "/gfx/stick_neutral.sprite",
         "/gfx/stick_0.sprite", 
         "/gfx/stick_1.sprite",
         "/gfx/stick_2.sprite",
@@ -233,10 +237,9 @@ void test_angles(struct StickAngles *a)
     graphics_set_color(COLOR_FOREGROUND, 0);
     text_set_font(FONT_BOLD);
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 9; i++) {
         char buf[128];
         snprintf(buf, sizeof(buf), "Hold %s and press A", angles[i]);
-        int a_held = 1;
 
         int f = dfs_open(gfx[i]);
         int size = dfs_size(f);
@@ -252,15 +255,20 @@ void test_angles(struct StickAngles *a)
         display_show(ctx);
 
         for (;;) {
-            struct controller_data data;
-            controller_read(&data);
-            if (data.c[0].A && !a_held) {
-                v[i].x = data.c[0].x;
-                v[i].y = data.c[0].y;
-                a_held = 1;
+            controller_scan();
+            struct controller_data cdata = get_keys_down();
+            if (cdata.c[0].A) {
+                if (i > 0 ) {
+                    cdata = get_keys_pressed();
+                    v[i-1].x = cdata.c[0].x;
+                    v[i-1].y = cdata.c[0].y;
+                } else {
+                    // raphnetraw needs some bytes for input or won't work,
+                    // dunno about real console
+                    uint8_t data[4];
+                    execute_raw_command(0, reset_cmd, 0, 4, NULL, data);
+                }
                 break;
-            } else if (!data.c[0].A) {
-                a_held = 0;
             }
         }
 
