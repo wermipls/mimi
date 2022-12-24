@@ -42,7 +42,7 @@ int main(void)
 
                 graphics_set_color(COLOR_FOREGROUND, 0);
                 text_set_font(FONT_BOLD);
-                text_draw(ctx, 32, 32, "mimi git-" ROM_VERSION " (built on " __DATE__ ")", ALIGN_LEFT);
+                text_draw(ctx, 32, 24, "mimi git-" ROM_VERSION " (built on " __DATE__ ")", ALIGN_LEFT);
 
                 static const char *options[] = {
                     "Range test (1 sample)",
@@ -59,10 +59,10 @@ int main(void)
                 for (int i = 0; i < menu_options; i++) {
                     int x = 42;
                     if (i == menu_selection) {
-                        text_draw(ctx, x - 10, 52 + i*10, ">", ALIGN_LEFT);
+                        text_draw(ctx, x - 10, 44 + i*11, ">", ALIGN_LEFT);
                     }
 
-                    text_draw(ctx, x, 52 + i*10, options[i], ALIGN_LEFT);
+                    text_draw(ctx, x, 44 + i*11, options[i], ALIGN_LEFT);
                 }
 
                 display_show(ctx);
@@ -119,7 +119,7 @@ int main(void)
                 graphics_set_color(COLOR_FOREGROUND, 0);
                 text_set_font(FONT_BOLD);
 
-                text_draw(ctx, 32, 32, "About", ALIGN_LEFT);
+                text_draw(ctx, 32, 24, "About", ALIGN_LEFT);
 
                 text_set_font(FONT_MEDIUM);
 
@@ -162,14 +162,14 @@ int main(void)
                 graphics_set_color(COLOR_FOREGROUND, 0);
 
                 text_set_font(FONT_BOLD);
-                text_draw(ctx, 32, 32, page_names[page], ALIGN_LEFT);
+                text_draw(ctx, 32, 24, page_names[page], ALIGN_LEFT);
 
                 if (page < pages - 1) {
-                    text_draw(ctx, 320-32, 213, "Next page >>", ALIGN_RIGHT);
+                    text_draw(ctx, 320-32, 205, "Next page >>", ALIGN_RIGHT);
                 }
 
                 if (page > 0) {
-                    text_draw(ctx, 32, 213, "<< Prev. page", ALIGN_LEFT);
+                    text_draw(ctx, 32, 205, "<< Prev. page", ALIGN_LEFT);
                 }
 
                 text_set_font(FONT_MEDIUM);
@@ -177,7 +177,7 @@ int main(void)
                 switch (page) 
                 {
                 case 0:
-                    text_draw_wordwrap(ctx, 32, 52, 320-64,
+                    text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "In the main menu:\n"
                         "* D-Pad - select option\n"
                         "* A - confirm selection\n\n"
@@ -191,7 +191,7 @@ int main(void)
                     );
                     break;
                 case 1:
-                    text_draw_wordwrap(ctx, 32, 52, 320-64,
+                    text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "User can take one or more measurements of the "
                         "analog values. More measurements help even out "
                         "any variations caused either by user error or "
@@ -207,7 +207,7 @@ int main(void)
                     );
                     break;
                 case 2:
-                    text_draw_wordwrap(ctx, 32, 52, 320-64,
+                    text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "Absolute analog values for each notch are displayed "
                         "on the right of the screen, as well as angles "
                         "for each diagonal. The values have colors assigned "
@@ -223,7 +223,7 @@ int main(void)
                     );
                     break;
                 case 3:
-                    text_draw_wordwrap(ctx, 32, 52, 320-64,
+                    text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "Some particularly bad controllers can have overly "
                         "high range, which would not fit the screen. Zoom "
                         "will be automatically changed to 75\% to compensate "

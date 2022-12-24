@@ -150,7 +150,7 @@ void print_stick_angles(display_context_t ctx, struct StickAngles a)
     text_draw(ctx, 270, y, buf, ALIGN_LEFT);
 
     text_set_font(FONT_BOLD);
-    int cardinals[] = {abs(a.u.y), abs(a.d.y), abs(a.l.x), abs(a.r.x)};
+    int cardinals[] = {a.u.y, -a.d.y, -a.l.x, a.r.x};
 
     for (int i = 0; i < 4; i++) {
         snprintf(buf, sizeof(buf), "%3d", cardinals[i]);
@@ -161,27 +161,27 @@ void print_stick_angles(display_context_t ctx, struct StickAngles a)
     }
 
     int diagonals[] = {
-        abs(a.ur.x), abs(a.ur.y),
-        abs(a.ul.x), abs(a.ul.y),
-        abs(a.dr.x), abs(a.dr.y),
-        abs(a.dl.x), abs(a.dl.y),
+         a.ur.x,  a.ur.y,
+        -a.ul.x,  a.ul.y,
+         a.dr.x, -a.dr.y,
+        -a.dl.x, -a.dl.y,
     };
 
     y += 10;
 
     for (int i = 0; i < 8; i += 2) {
         snprintf(buf, sizeof(buf), "%3d\n%3d", diagonals[i], diagonals[i+1]);
-        uint32_t c = get_range_color_diagonal(diagonals[i], diagonals[i+1]);
+        uint32_t c = get_range_color_diagonal(smax(0, diagonals[i]), smax(0, diagonals[i+1]));
         graphics_set_color(c, 0);
         text_draw(ctx, 263, y, buf, ALIGN_RIGHT);
         y += 30;
     }
 
     float angles[] = {
-        get_angle(abs(a.ur.x), abs(a.ur.y)),
-        get_angle(abs(a.ul.x), abs(a.ul.y)),
-        get_angle(abs(a.dr.x), abs(a.dr.y)),
-        get_angle(abs(a.dl.x), abs(a.dl.y)),
+        get_angle(diagonals[0], diagonals[1]),
+        get_angle(diagonals[2], diagonals[3]),
+        get_angle(diagonals[4], diagonals[5]),
+        get_angle(diagonals[6], diagonals[7]),
     };
 
     y = 15 + 60;
