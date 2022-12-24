@@ -297,6 +297,41 @@ struct StickAngles find_median(struct StickAngles a[], int n)
     return median;
 }
 
+float find_standard_deviation(struct StickAngles a[], int n)
+{
+    if (n < 2) return -1;
+
+    float values[16*n];
+
+    for (int i = 0; i < 16; i++) {
+        float mean = 0;
+        float *p = &values[n*i];
+
+        for (int j = 0; j < n; j++) {
+            p[j] = a[j].values[i];
+            mean += p[j];
+        }
+
+        mean = mean / (float)n;
+
+        // the values need to be normalized so each notch's axis
+        // becomes comparable to each other
+        for (int j = 0; j < n; j++) {
+            p[j] -= mean;
+        }
+    }
+
+    float variance = 0;
+
+    for (int i = 0; i < 16 * n; i++) {
+        float v = values[i];
+        variance += v * v;
+    }
+    variance = variance / (float)(16*n - 1);
+
+    return sqrtf(variance);
+}
+
 void display_angles(struct StickAngles a[], int sample_count)
 {
     enum Comparison current_comparison = COMP_NONE;
@@ -322,6 +357,33 @@ void display_angles(struct StickAngles a[], int sample_count)
         }
         draw_stick_angles(ctx, median, c);
         print_stick_angles(ctx, median);
+        
+        graphics_set_color(COLOR_FOREGROUND, 0);
+        int y = 15 + 10*17;
+
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%d", sample_count);
+        text_set_font(FONT_BOLD);
+        text_draw(ctx, 263, y, buf, ALIGN_RIGHT);
+
+        text_set_font(FONT_MEDIUM);
+        if (sample_count == 1) {
+            text_draw(ctx, 270, y, "test", ALIGN_LEFT);
+        } else {
+            text_draw(ctx, 270, y, "tests", ALIGN_LEFT);
+        }
+        
+        y += 10;
+        if (sample_count > 1) {
+            float sd = find_standard_deviation(a, sample_count);
+            snprintf(buf, sizeof(buf), "%.2f", sd);
+
+            text_set_font(FONT_BOLD);
+            text_draw(ctx, 263, y, buf, ALIGN_RIGHT);
+
+            text_set_font(FONT_MEDIUM);
+            text_draw(ctx, 270, y, "std dev", ALIGN_LEFT);
+        }
 
         text_set_font(FONT_BOLD);
         graphics_set_color(COLOR_FOREGROUND, 0);
