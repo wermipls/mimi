@@ -14,6 +14,9 @@ N64_CFLAGS += -DREPO_URL=\""$(REPO_URL)"\"
 all: $(ROMNAME)
 .PHONY: all
 
+build/main.o: .FORCE
+.FORCE:
+
 SRCS = $(wildcard $(SOURCE_DIR)/*.c)
 OBJS = $(SRCS:$(SOURCE_DIR)/%.c=$(BUILD_DIR)/%.o)
 
