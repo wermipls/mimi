@@ -5,6 +5,7 @@
 #include "range_test.h"
 #include "text.h"
 #include "colors.h"
+#include "input.h"
 
 enum Screen
 {
@@ -82,7 +83,7 @@ int main(void)
                 display_show(ctx);
 
                 controller_scan();
-                struct controller_data cdata = get_keys_down();
+                struct controller_data cdata = get_keys_down_filtered();
 
                 if (cdata.c[0].A) {
                     switch (menu_selection)
@@ -154,7 +155,7 @@ int main(void)
                 display_show(ctx);
 
                 controller_scan();
-                struct controller_data cdata = get_keys_down();
+                struct controller_data cdata = get_keys_down_filtered();
                 
                 if (cdata.c[0].A || cdata.c[0].B || cdata.c[0].start) {
                     current_screen = SCR_MAIN_MENU;
@@ -269,7 +270,7 @@ int main(void)
                 display_show(ctx);
 
                 controller_scan();
-                struct controller_data cdata = get_keys_down();
+                struct controller_data cdata = get_keys_down_filtered();
                 
                 if (cdata.c[0].A || cdata.c[0].B || cdata.c[0].start) {
                     current_screen = SCR_MAIN_MENU;

@@ -8,6 +8,7 @@
 #include "drawing.h"
 #include "text.h"
 #include "util.h"
+#include "input.h"
 
 struct StickAngles perfect_n64 =
 {
@@ -256,7 +257,7 @@ void test_angles(struct StickAngles *a)
 
         for (;;) {
             controller_scan();
-            struct controller_data cdata = get_keys_down();
+            struct controller_data cdata = get_keys_down_filtered();
             if (cdata.c[0].A) {
                 if (i > 0 ) {
                     cdata = get_keys_pressed();
@@ -445,7 +446,7 @@ void display_angles(struct StickAngles a[], int sample_count)
         display_show(ctx);
 
         controller_scan();
-        struct controller_data cdata = get_keys_down();
+        struct controller_data cdata = get_keys_down_filtered();
         if (cdata.c[0].start) {
             return;
         }
