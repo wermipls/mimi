@@ -119,9 +119,9 @@ uint32_t get_angle_color(float angle)
 
     if (diff < 1) {
         return graphics_make_color(0, 255, 64, 255);
-    } else if (diff < 2) {
-        return graphics_make_color(192, 255, 0, 255);
     } else if (diff < 3) {
+        return graphics_make_color(192, 255, 0, 255);
+    } else if (diff < 5) {
         return graphics_make_color(255, 128, 64, 255);
     } else {
         return graphics_make_color(255, 64, 0, 255);
@@ -304,7 +304,7 @@ void display_angles(struct StickAngles a[], int sample_count)
 
     uint32_t c  = graphics_make_color(0, 192, 255, 255);
     uint32_t c2 = graphics_make_color(64, 255, 0, 255);
-    uint32_t c3 = graphics_make_color(0, 0, 255, 255);
+    uint32_t c3 = graphics_make_color(64, 64, 64, 255);
 
     struct StickAngles median = find_median(a, sample_count);
 

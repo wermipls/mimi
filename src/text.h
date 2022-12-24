@@ -21,3 +21,4 @@ void text_init();
 void text_set_font(enum Font f);
 int text_get_line_width(const char s[]);
 void text_draw(display_context_t ctx, int x, int y, const char s[], enum TextAlign align);
+void text_draw_wordwrap(display_context_t ctx, int x, int y, int w, const char s[]);
