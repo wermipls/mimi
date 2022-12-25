@@ -3,6 +3,10 @@
 
 **mimi** is a controller test rom for Nintendo 64. It's heavily inspired by [sanni's controllertest](https://github.com/sanni/controllertest/tree/master/N64-Port) and [max257612's fork thereof](https://github.com/max257612/controllertest), however it is written completely from scratch. Differences include improved graphics, ability to take multiple measurements, improved judgement of ranges, additional information on result screen, more extensible codebase, as well as various UX improvements.
 
+If you use this software commercially (e.g. to provide measurements for the controllers you sell), consider buying me a Ko-fi.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/B0B37GRPD)
+
 ## Download
 Latest version of the ROM can be found [here](https://github.com/wermipls/mimi/releases).
 
@@ -51,4 +55,4 @@ Special thanks to adelyn, alaris, Bailey, billy, egasyelir, GiBoss, jwaterman, K
 * [Enter Command font by Font End Dev](https://fontenddev.com/fonts/enter-command/), licensed under CC BY 4.0
 
 ## License
-TBD
+MIT
