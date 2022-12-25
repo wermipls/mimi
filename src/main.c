@@ -42,6 +42,7 @@ int main(void)
     struct StickAngles result[9];
     display_context_t ctx;
     int sample_count = -1;
+    int is_unsaved_result = 0;
 
     for (;;) {
         switch (current_screen)
@@ -288,9 +289,40 @@ int main(void)
             }
             break;
         case SCR_RANGE_TEST:
+            if (is_unsaved_result) {
+                for (;;) {
+                    while ((ctx = display_lock()) == 0) {}
+
+                    graphics_fill_screen(ctx, COLOR_BACKGROUND);
+
+                    graphics_set_color(COLOR_FOREGROUND, 0);
+                    text_set_font(FONT_BOLD);
+                    text_draw(ctx, 160, 80, "Previous result will be discarded.\nAre you sure?", ALIGN_CENTER);
+                    text_set_font(FONT_MEDIUM);
+                    text_draw(ctx, 160, 160, "Press Start to continue or B to cancel.", ALIGN_CENTER);
+
+                    display_show(ctx);
+
+                    controller_scan();
+                    struct controller_data cdata = get_keys_down_filtered();
+
+                    if (cdata.c[0].start) {
+                        is_unsaved_result = 0;
+                        break;
+                    } else if (cdata.c[0].B) {
+                        break;
+                    }
+                }
+            }
+            if (is_unsaved_result) {
+                current_screen = SCR_MAIN_MENU;
+                break;
+            }
+
             for (int i = 0; i < sample_count; i++) {
                 test_angles(&result[i], i+1);
             }
+            is_unsaved_result = 1;
             current_screen = SCR_RANGE_RESULT;
             break;
         case SCR_RANGE_RESULT:
