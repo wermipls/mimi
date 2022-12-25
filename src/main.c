@@ -239,7 +239,8 @@ int main(void)
                     text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "The measurement display can also be overriden with "
                         "one of the example ones, to let user view the expected "
-                        "values and angles.\n\n"
+                        "values and angles. The measurement is displayed in pink "
+                        "to differentiate between actual measurements.\n\n"
 
                         "Some particularly bad controllers can have overly "
                         "high range, which would not fit the screen. Zoom "
@@ -288,7 +289,7 @@ int main(void)
             break;
         case SCR_RANGE_TEST:
             for (int i = 0; i < sample_count; i++) {
-                test_angles(&result[i]);
+                test_angles(&result[i], i+1);
             }
             current_screen = SCR_RANGE_RESULT;
             break;
