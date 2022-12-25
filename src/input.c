@@ -1,25 +1,12 @@
-#include <stdlib.h>
-
 #include "input.h"
 
-struct controller_data previous;
-
-void input_read_held(struct controller_data *data)
+struct controller_data get_keys_down_filtered()
 {
-    controller_read(data);
-    previous = *data;
-}
-
-void input_read_pressed(struct controller_data *data)
-{
-    struct controller_data current; 
-    controller_read(&current);
-    *data = current;
-
+    struct controller_data d = get_keys_down();
     for (int i = 0; i < 4; i++) {
-        uint32_t a = ~(~current.c[i].data | previous.c[i].data);
-        data->c[i].data = a;
+        if (d.c[0].err != ERROR_NONE) {
+            d.c[0].data = 0;
+        }
     }
-
-    previous = current;
+    return d;
 }

@@ -2,6 +2,12 @@
 
 #include <math.h>
 
+struct Vec2
+{
+    int x;
+    int y;
+};
+
 static inline int smin(int a, int b)
 {
     return a > b ? b : a;

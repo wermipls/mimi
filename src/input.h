@@ -2,5 +2,4 @@
 
 #include <libdragon.h>
 
-void input_read_held(struct controller_data *data);
-void input_read_pressed(struct controller_data *data);
+struct controller_data get_keys_down_filtered();

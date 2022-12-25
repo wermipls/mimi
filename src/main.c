@@ -1,291 +1,30 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
 #include <libdragon.h>
+#include <exception.h>
+#include <stdlib.h>
 
-#include "drawing.h"
+#include "range_test.h"
 #include "text.h"
-#include "util.h"
+#include "colors.h"
 #include "input.h"
-
-#define REPO_URL "github.com/wermipls/mimi"
-
-struct Vec2
-{
-    int x;
-    int y;
-};
-
-struct StickAngles
-{
-    struct Vec2 u;
-    struct Vec2 ur;
-    struct Vec2 r;
-    struct Vec2 dr;
-    struct Vec2 d;
-    struct Vec2 dl;
-    struct Vec2 l;
-    struct Vec2 ul;
-};
-
-struct StickAngles perfect_n64 =
-{
-    { 0,  85},
-    { 70, 70},
-    { 85, 0 },
-    { 70,-70},
-    { 0, -85},
-    {-70,-70},
-    {-85, 0 },
-    {-70, 70},
-};
-
-struct StickAngles perfect_hori =
-{
-    { 0,  100},
-    { 75, 75},
-    { 100, 0 },
-    { 75,-75},
-    { 0, -100},
-    {-75,-75},
-    {-100, 0 },
-    {-75, 75},
-};
-
-enum Comparison
-{
-    COMP_NONE,
-    COMP_N64,
-    COMP_HORI,
-
-    COMP_MAX,
-};
-
-struct StickAngles *comparisons[] =
-{
-    NULL,
-    &perfect_n64,
-    &perfect_hori,
-};
-
-const char *comparison_names[] =
-{
-    "Benchmark results",
-    "Perfect N64 OEM comparison",
-    "Perfect Horipad Mini comparison",
-};
-
-uint32_t color_foreground;
-uint32_t color_background;
-
-void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t color)
-{
-    struct Vec2 *v = (struct Vec2*)&a;
-
-    for (int i = 0; i < 8; i++) {
-        int j = (i + 1) % 8;
-        draw_aa_line(
-            ctx, 
-            120 + v[i].x, 
-            120 - v[i].y, 
-            120 + v[j].x,
-            120 - v[j].y,
-            color);
-    }
-}
-
-void draw_center_cross(display_context_t ctx)
-{
-    int x, y;
-    y = 120;
-    for (x = 0; x < 240; x++) {
-        int i = smin(240 - abs(240 - x * 2), 120);
-        graphics_draw_pixel_trans(ctx, x, y, graphics_make_color(255, 255, 255, i));
-    }
-
-    x = 120;
-    for (y = 0; y < 240; y++) {
-        int i = smin(240 - abs(240 - y * 2), 120);
-        graphics_draw_pixel_trans(ctx, x, y, graphics_make_color(255, 255, 255, i));
-    }
-}
-
-uint32_t get_range_color_cardinal(int a)
-{
-    if (a >= 80) {
-        return graphics_make_color(0, 255, 64, 255);
-    } else if (a >= 75) {
-        return graphics_make_color(192, 255, 0, 255);
-    } else if (a >= 70) {
-        return graphics_make_color(255, 128, 64, 255);
-    } else {
-        return graphics_make_color(255, 64, 0, 255);
-    }
-}
-
-uint32_t get_range_color_diagonal(int x, int y)
-{
-    float euclidean = sqrtf(x*x + y*y);
-
-    return get_range_color_cardinal(euclidean / 1.125);
-}
-
-uint32_t get_angle_color(float angle)
-{
-
-    float diff = fabsf(45.0f - angle);
-
-    if (diff < 1) {
-        return graphics_make_color(0, 255, 64, 255);
-    } else if (diff < 2) {
-        return graphics_make_color(192, 255, 0, 255);
-    } else if (diff < 3) {
-        return graphics_make_color(255, 128, 64, 255);
-    } else {
-        return graphics_make_color(255, 64, 0, 255);
-    }
-}
-
-void print_stick_angles(display_context_t ctx, struct StickAngles a)
-{
-    char buf[1024];
-    snprintf(buf, sizeof(buf),
-        "up   \n"
-        "down \n"
-        "left \n" 
-        "right\n\n"
-        "UR\n\n\n"
-        "UL\n\n\n"
-        "DR\n\n\n"
-        "DL"
-    );
-
-    int y = 15;
-
-    graphics_set_color(color_foreground, 0);
-
-    text_set_font(FONT_MEDIUM);
-    text_draw(ctx, 270, y, buf, ALIGN_LEFT);
-
-    text_set_font(FONT_BOLD);
-    int cardinals[] = {abs(a.u.y), abs(a.d.y), abs(a.l.x), abs(a.r.x)};
-
-    for (int i = 0; i < 4; i++) {
-        snprintf(buf, sizeof(buf), "%3d", cardinals[i]);
-        uint32_t c = get_range_color_cardinal(cardinals[i]);
-        graphics_set_color(c, 0);
-        text_draw(ctx, 263, y, buf, ALIGN_RIGHT);
-        y += 10;
-    }
-
-    int diagonals[] = {
-        abs(a.ur.x), abs(a.ur.y),
-        abs(a.ul.x), abs(a.ul.y),
-        abs(a.dr.x), abs(a.dr.y),
-        abs(a.dl.x), abs(a.dl.y),
-    };
-
-    y += 10;
-
-    for (int i = 0; i < 8; i += 2) {
-        snprintf(buf, sizeof(buf), "%3d\n%3d", diagonals[i], diagonals[i+1]);
-        uint32_t c = get_range_color_diagonal(diagonals[i], diagonals[i+1]);
-        graphics_set_color(c, 0);
-        text_draw(ctx, 263, y, buf, ALIGN_RIGHT);
-        y += 30;
-    }
-
-    float angles[] = {
-        get_angle(abs(a.ur.x), abs(a.ur.y)),
-        get_angle(abs(a.ul.x), abs(a.ul.y)),
-        get_angle(abs(a.dr.x), abs(a.dr.y)),
-        get_angle(abs(a.dl.x), abs(a.dl.y)),
-    };
-
-    y = 15 + 60;
-    text_set_font(FONT_MEDIUM);
-
-    for (int i = 0; i < 4; i++) {
-        snprintf(buf, sizeof(buf), "%2.1f" SYMBOL_DEGREES, angles[i]);
-        uint32_t c = get_angle_color(angles[i]);
-        graphics_set_color(c, 0);
-        text_draw(ctx, 270, y, buf, ALIGN_LEFT);
-        y += 30;
-    }
-}
-
-void test_angles(struct StickAngles *a)
-{
-    static const char *angles[] =
-    {
-        "Up",
-        "Up-Right",
-        "Right",
-        "Down-Right",
-        "Down",
-        "Down-Left",
-        "Left",
-        "Up-Left",
-    };
-
-    static const char *gfx[] =
-    {
-        "/gfx/stick_0.sprite", 
-        "/gfx/stick_1.sprite",
-        "/gfx/stick_2.sprite",
-        "/gfx/stick_3.sprite",
-        "/gfx/stick_4.sprite",
-        "/gfx/stick_5.sprite",
-        "/gfx/stick_6.sprite",
-        "/gfx/stick_7.sprite",
-    };
-
-    struct Vec2 *v = (struct Vec2*)a;
-
-    graphics_set_color(color_foreground, 0);
-    text_set_font(FONT_BOLD);
-
-    for (int i = 0; i < 8; i++) {
-        char buf[128];
-        snprintf(buf, sizeof(buf), "Hold %s and press A", angles[i]);
-        int a_held = 1;
-
-        int f = dfs_open(gfx[i]);
-        int size = dfs_size(f);
-        sprite_t *stick = malloc(size);
-        dfs_read(stick, size, 1, f);
-        dfs_close(f);
-
-        display_context_t ctx;
-        while ((ctx = display_lock()) == 0) {}
-        graphics_fill_screen(ctx, color_background);
-        graphics_draw_sprite(ctx, (320-128)/2, (240-128)/2, stick);
-        text_draw(ctx, 320/2, 32, buf, ALIGN_CENTER);
-        display_show(ctx);
-
-        for (;;) {
-            struct controller_data data;
-            controller_read(&data);
-            if (data.c[0].A && !a_held) {
-                v[i].x = data.c[0].x;
-                v[i].y = data.c[0].y;
-                a_held = 1;
-                break;
-            } else if (!data.c[0].A) {
-                a_held = 0;
-            }
-        }
-
-        free(stick);
-    }
-}
 
 enum Screen
 {
+    SCR_MAIN_MENU,
+    SCR_HELP,
+    SCR_ABOUT,
     SCR_RANGE_TEST,
     SCR_RANGE_RESULT,
 };
+
+void reset_handler(exception_t *ex)
+{
+    if (ex->type != EXCEPTION_TYPE_RESET) {
+        exception_default_handler(ex);
+        return;
+    }
+
+    abort();
+}
 
 int main(void)
 {
@@ -296,67 +35,299 @@ int main(void)
     text_init();
 
     console_set_debug(true);
-
-    color_foreground = graphics_make_color(255, 255, 255, 255);
-    color_background = graphics_make_color(0, 0, 0, 255);
+    register_exception_handler(reset_handler);
 
     enum Screen current_screen = 0;
 
-    struct StickAngles result;
-    uint32_t c  = graphics_make_color(0, 64, 255, 255);
-    uint32_t c2 = graphics_make_color(64, 255, 0, 255);
+    struct StickAngles result[9];
+    display_context_t ctx;
+    int sample_count = -1;
+    int is_unsaved_result = 0;
 
     for (;;) {
         switch (current_screen)
         {
+        case SCR_MAIN_MENU:
+            static int menu_selection = 0;
+
+            text_set_line_height(11);
+            for (;;) {
+                while ((ctx = display_lock()) == 0) {}
+
+                graphics_fill_screen(ctx, COLOR_BACKGROUND);
+
+                graphics_set_color(COLOR_FOREGROUND, 0);
+                text_set_font(FONT_BOLD);
+                text_draw(ctx, 32, 24, "mimi git-" ROM_VERSION " (built on " __DATE__ ")", ALIGN_LEFT);
+
+                static const char *options[] = {
+                    "Range test (1 sample)",
+                    "Range test (3 samples)",
+                    "Range test (5 samples)",
+                    "Display last range result",
+                    "Help",
+                    "About",
+                };
+
+                int menu_options = sizeof(options)/sizeof(char*);
+                text_set_font(FONT_MEDIUM);
+
+                for (int i = 0; i < menu_options; i++) {
+                    int x = 42;
+                    if (i == menu_selection) {
+                        text_draw(ctx, x - 10, 44 + i*11, ">", ALIGN_LEFT);
+                    }
+
+                    text_draw(ctx, x, 44 + i*11, options[i], ALIGN_LEFT);
+                }
+
+                display_show(ctx);
+
+                controller_scan();
+                struct controller_data cdata = get_keys_down_filtered();
+
+                if (cdata.c[0].A) {
+                    switch (menu_selection)
+                    {
+                    case 0:
+                        sample_count = 1;
+                        current_screen = SCR_RANGE_TEST;
+                        break;
+                    case 1:
+                        sample_count = 3;
+                        current_screen = SCR_RANGE_TEST;
+                        break;
+                    case 2:
+                        sample_count = 5;
+                        current_screen = SCR_RANGE_TEST;
+                        break;
+                    case 3:
+                        if (sample_count > 0) {
+                            current_screen = SCR_RANGE_RESULT;
+                        }
+                        break;
+                    case 4:
+                        current_screen = SCR_HELP;
+                        break;
+                    case 5:
+                        current_screen = SCR_ABOUT;
+                        break;
+                    }
+                }
+
+                if (current_screen != SCR_MAIN_MENU) {
+                    break;
+                }
+
+                if (cdata.c[0].up) {
+                    menu_selection--;
+                    if (menu_selection < 0) menu_selection = menu_options - 1;
+                } else if (cdata.c[0].down) {
+                    menu_selection++;
+                    if (menu_selection >= menu_options) menu_selection = 0;
+                }
+            }
+            break;
+        case SCR_ABOUT:
+            text_set_line_height(11);
+            for (;;) {
+                while ((ctx = display_lock()) == 0) {}
+
+                graphics_fill_screen(ctx, COLOR_BACKGROUND);
+
+                graphics_set_color(COLOR_FOREGROUND, 0);
+                text_set_font(FONT_BOLD);
+
+                text_draw(ctx, 32, 24, "About", ALIGN_LEFT);
+
+                text_set_font(FONT_MEDIUM);
+
+                text_draw_wordwrap(ctx, 32, 44, 320-64, 
+                    "mimi controller test ROM by wermi\n"
+                    "version " ROM_VERSION ", built on " __DATE__ "\n\n"
+                    REPO_URL "\n\n"
+                    "Enter Command font by Font End Dev (fontenddev.com), "
+                    "licensed under CC BY 4.0\n\n"
+                    "This ROM is heavily inspired by sanni's controllertest "
+                    "port for N64, as well as max257612's fork of it, however "
+                    "it is written completely from scratch.\n\n"
+                );
+
+                display_show(ctx);
+
+                controller_scan();
+                struct controller_data cdata = get_keys_down_filtered();
+                
+                if (cdata.c[0].A || cdata.c[0].B || cdata.c[0].start) {
+                    current_screen = SCR_MAIN_MENU;
+                    break;
+                }
+            }
+            break;
+        case SCR_HELP:
+            const char *page_names[] = {
+                "Basic controls",
+                "Range testing",
+                "Range testing cont.",
+                "Range testing cont.",
+            };
+            const int pages = sizeof(page_names) / sizeof(char*);
+            int page = 0;
+
+            text_set_line_height(11);
+            for (;;) {
+                while ((ctx = display_lock()) == 0) {}
+
+                graphics_fill_screen(ctx, COLOR_BACKGROUND);
+                graphics_set_color(COLOR_FOREGROUND, 0);
+
+                text_set_font(FONT_BOLD);
+                text_draw(ctx, 32, 24, page_names[page], ALIGN_LEFT);
+
+                if (page < pages - 1) {
+                    text_draw(ctx, 320-32, 205, "Next page >>", ALIGN_RIGHT);
+                }
+
+                if (page > 0) {
+                    text_draw(ctx, 32, 205, "<< Prev. page", ALIGN_LEFT);
+                }
+
+                text_set_font(FONT_MEDIUM);
+
+                switch (page) 
+                {
+                case 0:
+                    text_set_font(FONT_MEDIUM);
+                    text_draw(ctx, 32, 44 + 11*0,
+                        "* D-Pad Left/Right or L/R - change page\n"
+                        "* A/B - return to main menu", ALIGN_LEFT);
+                    text_set_font(FONT_BOLD);
+                    text_draw(ctx, 32, 44 + 11*3,
+                        "In the main menu:", ALIGN_LEFT);
+                    text_set_font(FONT_MEDIUM);
+                    text_draw(ctx, 32, 44 + 11*4,
+                        "* D-Pad - select option\n"
+                        "* A - confirm selection\n", ALIGN_LEFT);
+                    text_set_font(FONT_BOLD);
+                    text_draw(ctx, 32, 44 + 11*7,
+                        "On the range test result screen:", ALIGN_LEFT);
+                    text_set_font(FONT_MEDIUM);
+                    text_draw(ctx, 32, 44 + 11*8,
+                        "* L/R - switch between range comparisons\n"
+                        "* D-Pad Up/Down - switch between measurements\n"
+                        "* D-Pad Left/Right - switch between\n"
+                        "  example ranges and result measurements\n"
+                        "* Z - change zoom\n"
+                        "* Start - return to main menu\n", ALIGN_LEFT);
+                    break;
+                case 1:
+                    text_draw_wordwrap(ctx, 32, 44, 320-64,
+                        "User can take one or more measurements of the "
+                        "analog values. More measurements help even out "
+                        "any variations caused either by user error or "
+                        "stick inconsistency. A median is taken from "
+                        "all measurements and gets displayed in light blue "
+                        "as the default measurement. The remaining "
+                        "measurements are drawn in the background in gray "
+                        "to visualise deviations.\n\n"
+
+                        "Optionally, a comparison to an example range "
+                        "(displayed in green) can be enabled, which helps "
+                        "to judge the controller's range."
+                    );
+                    break;
+                case 2:
+                    text_draw_wordwrap(ctx, 32, 44, 320-64,
+                        "The measurement display can also be overriden with "
+                        "one of the example ones, to let user view the expected "
+                        "values and angles. The measurement is displayed in pink "
+                        "to differentiate between actual measurements.\n\n"
+
+                        "Some particularly bad controllers can have overly "
+                        "high range, which would not fit the screen. Zoom "
+                        "will be automatically changed to 75\% to compensate "
+                        "in those cases, but the setting can be manually "
+                        "overriden by user."
+                    );
+                    break;
+                case 3:
+                    text_draw_wordwrap(ctx, 32, 44, 320-64,
+                        "Absolute analog values for each notch are displayed "
+                        "on the right of the screen, as well as angles "
+                        "for each diagonal. The values have colors assigned "
+                        "based on following criteria:\n"
+                        "* green - 80+ magnitude OR w/in 1" SYMBOL_DEGREES " from 45" SYMBOL_DEGREES "\n"
+                        "* lime - 75+ magnitude OR w/in 3" SYMBOL_DEGREES " from 45" SYMBOL_DEGREES "\n"
+                        "* orange - 70+ magnitude OR w/in 5" SYMBOL_DEGREES " from 45" SYMBOL_DEGREES "\n"
+                        "* red - any other value\n\n"
+
+                        "The diagonal magnitude cutoffs are 9/8th times "
+                        "the cardinal ones to compensate for higher "
+                        "magnitude diagonals on original N64 controllers."
+                    );
+                    break;
+                }
+
+
+                display_show(ctx);
+
+                controller_scan();
+                struct controller_data cdata = get_keys_down_filtered();
+                
+                if (cdata.c[0].A || cdata.c[0].B || cdata.c[0].start) {
+                    current_screen = SCR_MAIN_MENU;
+                    break;
+                }
+
+                if (cdata.c[0].right || cdata.c[0].R) {
+                    if (page < pages - 1) page++;
+                }
+
+                if (cdata.c[0].left || cdata.c[0].L) {
+                    if (page > 0) page--;
+                }
+            }
+            break;
         case SCR_RANGE_TEST:
-            test_angles(&result);
+            if (is_unsaved_result) {
+                for (;;) {
+                    while ((ctx = display_lock()) == 0) {}
+
+                    graphics_fill_screen(ctx, COLOR_BACKGROUND);
+
+                    graphics_set_color(COLOR_FOREGROUND, 0);
+                    text_set_font(FONT_BOLD);
+                    text_draw(ctx, 160, 80, "Previous result will be discarded.\nAre you sure?", ALIGN_CENTER);
+                    text_set_font(FONT_MEDIUM);
+                    text_draw(ctx, 160, 160, "Press Start to continue or B to cancel.", ALIGN_CENTER);
+
+                    display_show(ctx);
+
+                    controller_scan();
+                    struct controller_data cdata = get_keys_down_filtered();
+
+                    if (cdata.c[0].start) {
+                        is_unsaved_result = 0;
+                        break;
+                    } else if (cdata.c[0].B) {
+                        break;
+                    }
+                }
+            }
+            if (is_unsaved_result) {
+                current_screen = SCR_MAIN_MENU;
+                break;
+            }
+
+            for (int i = 0; i < sample_count; i++) {
+                test_angles(&result[i], i+1);
+            }
+            is_unsaved_result = 1;
             current_screen = SCR_RANGE_RESULT;
             break;
-        case SCR_RANGE_RESULT: ;
-            static enum Comparison current_comparison = COMP_NONE;
-
-            display_context_t ctx;
-            while ((ctx = display_lock()) == 0) {}
-
-            graphics_fill_screen(ctx, color_background);
-
-            draw_center_cross(ctx);
-            if (comparisons[current_comparison]) {
-                draw_stick_angles(ctx, *comparisons[current_comparison], c2);
-            }
-            draw_stick_angles(ctx, result, c);
-            print_stick_angles(ctx, result);
-
-            text_set_font(FONT_BOLD);
-            graphics_set_color(color_foreground, 0);
-            text_draw(ctx, 120, 15, comparison_names[current_comparison], ALIGN_CENTER);
-
-            text_set_font(FONT_MEDIUM);
-            graphics_set_color(graphics_make_color(128, 128, 128, 255), 0);
-            text_draw(ctx, 320 - 16, 213, REPO_URL, ALIGN_RIGHT);
-
-            display_show(ctx);
-
-            struct controller_data cdata;
-            input_read_pressed(&cdata);
-            if (cdata.c[0].start) {
-                current_screen = SCR_RANGE_TEST;
-            }
-
-            if (cdata.c[0].L) {
-                if (current_comparison == 0) {
-                    current_comparison = COMP_MAX - 1;
-                } else {
-                    current_comparison--;
-                }
-            } else if (cdata.c[0].R) {
-                current_comparison++;
-                if (current_comparison >= COMP_MAX) {
-                    current_comparison = 0;
-                }
-            }
-            break;
+        case SCR_RANGE_RESULT:
+            display_angles(result, sample_count);
+            current_screen = SCR_MAIN_MENU;
         }
     }
 }

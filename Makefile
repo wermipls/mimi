@@ -5,12 +5,20 @@ include $(N64_INST)/include/n64.mk
 ROM_VERSION=$(shell git describe --always --match 'NOT A TAG')
 NAME=mimi-$(ROM_VERSION)
 ROMNAME=$(NAME).z64
+REPO_URL=github.com/wermipls/mimi
 FS=$(BUILD_DIR)/data.dfs
+
+N64_CFLAGS += -DROM_VERSION=\""$(ROM_VERSION)"\"
+N64_CFLAGS += -DREPO_URL=\""$(REPO_URL)"\"
 
 all: $(ROMNAME)
 .PHONY: all
 
-OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/drawing.o $(BUILD_DIR)/text.o $(BUILD_DIR)/input.o
+build/main.o: .FORCE
+.FORCE:
+
+SRCS = $(wildcard $(SOURCE_DIR)/*.c)
+OBJS = $(SRCS:$(SOURCE_DIR)/%.c=$(BUILD_DIR)/%.o)
 
 $(ROMNAME): N64_ROM_TITLE="mimi controller test"
 $(ROMNAME): $(FS)
