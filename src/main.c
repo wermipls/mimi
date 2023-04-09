@@ -176,6 +176,7 @@ int main(void)
                 "Range testing",
                 "Range testing cont.",
                 "Range testing cont.",
+                "Live range testing",
             };
             const int pages = sizeof(page_names) / sizeof(char*);
             int page = 0;
@@ -271,6 +272,22 @@ int main(void)
                         "the cardinal ones to compensate for higher "
                         "magnitude diagonals on original N64 controllers."
                     );
+                    break;
+                case 4:
+                    text_draw_wordwrap(ctx, 32, 44, 320-64, 
+                        "Displays live X/Y values on a graph using ideal "
+                        "OEM controller values as an overlay. Displays "
+                        "the most recent 2,048 values in blue, and the "
+                        "current X/Y values as integers.\n\n"
+                    );
+
+                    text_set_font(FONT_BOLD);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 5), 320-64, 
+                        "On the live range testing screen:\n");
+                    text_set_font(FONT_MEDIUM);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 6), 320-64,
+                        "* Z - toggle history display\n"
+                        "* Start - return to main menu\n");
                     break;
                 }
 

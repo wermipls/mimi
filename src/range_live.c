@@ -37,7 +37,7 @@ void display_live_ranges() {
     
     int sz_history = 2048;
     struct Vec2 history[sz_history];
-    int count = 0;
+    int count = 0, show_history = 1;
 
     for (;;) {
         while ((ctx = display_lock()) == 0) {}
@@ -47,28 +47,40 @@ void display_live_ranges() {
         graphics_set_color(COLOR_FOREGROUND, 0);
 
         struct controller_data cdata = get_keys_pressed();
-        char buf[128];
+        char buf[128], lbl_buf[128];
+        snprintf(lbl_buf, sizeof(lbl_buf), "Live range display");
+        text_draw(ctx, 120, 15, lbl_buf, ALIGN_CENTER);
+
         controller_scan();
         struct Vec2 v = { cdata.c[0].x, cdata.c[0].y };
 
         snprintf(buf, sizeof(buf), "x: %d\ny: %d", v.x, v.y);
         text_draw_wordwrap(ctx, 256, 24, 320-64, buf);
         draw_center_cross(ctx);
-        graphics_draw_sprite(ctx, v.x + 118, (v.y * -1) + 118, point);
         draw_stick_angles(ctx, live_compare, c_green, 0);
 
-        if (count < sz_history) {
-            count += 1;
+        if (show_history == 1) {
+            if (count < sz_history) {
+                count += 1;
+            }
+
+            history[0] = v;
+            for (int i = smin(count, sz_history); i > 0; i--) {
+                history[i] = history[i - 1];
+                graphics_draw_pixel_trans(ctx, history[i].x + 118, (history[i].y * -1) + 118, c_blue);
+            } 
         }
 
-        history[0] = v;
-        for (int i = smin(count, sz_history); i > 0; i--) {
-            history[i] = history[i - 1];
-            graphics_draw_pixel_trans(ctx, history[i].x + 118, (history[i].y * -1) + 118, c_blue);
-        } 
+        graphics_draw_sprite(ctx, v.x + 118, (v.y * -1) + 118, point);
 
         if (cdata.c[0].start) {
             break;
+        }
+
+        cdata = get_keys_down_filtered();
+        if (cdata.c[0].Z) {
+            show_history = abs(show_history - 1);
+            if (show_history == 0) count = 0;
         }
     }
 
