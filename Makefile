@@ -34,6 +34,7 @@ $(FS): $(wildcard fs/*) $(wildcard gfx/*)
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_6.png fs/gfx/stick_6.sprite
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_7.png fs/gfx/stick_7.sprite
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_neutral.png fs/gfx/stick_neutral.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/point.png fs/gfx/point.sprite
 	$(N64_MKDFS) $@ fs
 
 $(BUILD_DIR)/$(NAME).elf: $(OBJS)

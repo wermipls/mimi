@@ -63,11 +63,11 @@ int main(void)
                 text_draw(ctx, 32, 24, "mimi git-" ROM_VERSION " (built on " __DATE__ ")", ALIGN_LEFT);
 
                 static const char *options[] = {
-                    "Live range display",
                     "Range test (1 sample)",
                     "Range test (3 samples)",
                     "Range test (5 samples)",
                     "Display last range result",
+                    "Live range display",
                     "Help",
                     "About",
                 };
@@ -92,7 +92,7 @@ int main(void)
                 if (cdata.c[0].A) {
                     switch (menu_selection)
                     {
-                    case 4:
+                    case 0:
                         sample_count = 1;
                         current_screen = SCR_RANGE_TEST;
                         break;
@@ -109,7 +109,7 @@ int main(void)
                             current_screen = SCR_RANGE_RESULT;
                         }
                         break;
-                    case 0:
+                    case 4:
                         current_screen = SCR_LIVE;
                         break;
                     case 5:
