@@ -60,7 +60,7 @@ void display_live_ranges() {
     int count = 0, 
         line_height = 11,
         show_history = 1, 
-        sz_history = 2048,
+        sz_history = 1024,
         current_comparison = 1,
         comparison_count = sizeof(live_comparisons) / sizeof(0);
     text_set_line_height(line_height);
@@ -149,7 +149,7 @@ void display_live_ranges() {
 
         if (show_history == 1) {
             if (count < sz_history) {
-                count += 1;
+                count++;
             }
 
             history[0] = v;

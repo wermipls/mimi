@@ -276,9 +276,10 @@ int main(void)
                 case 4:
                     text_draw_wordwrap(ctx, 32, 44, 320-64, 
                         "Displays live X/Y values on a graph using ideal "
-                        "OEM controller values as an overlay. Displays "
-                        "the most recent 2,048 values in blue, and the "
-                        "current X/Y values as integers.\n\n"
+                        "OEM or Hori values as an overlay. Displays "
+                        "the most recent 1,024 values in blue, and the "
+                        "current X/Y values as integers. Shows icons "
+                        "indicating which buttons are being pressed.\n\n"
                     );
 
                     text_set_font(FONT_BOLD);
