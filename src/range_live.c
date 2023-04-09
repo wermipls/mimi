@@ -35,7 +35,7 @@ void display_live_ranges() {
     dfs_read(point, size, 1, f);
     dfs_close(f);
     
-    int sz_history = 1024;
+    int sz_history = 2048;
     struct Vec2 history[sz_history];
     int count = 0;
 
