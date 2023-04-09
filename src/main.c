@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "range_test.h"
+#include "range_live.h"
 #include "text.h"
 #include "colors.h"
 #include "input.h"
@@ -334,31 +335,7 @@ int main(void)
             display_angles(result, sample_count);
             current_screen = SCR_MAIN_MENU;
         case SCR_LIVE:
-            text_set_line_height(11);
-            for (;;) {
-                while ((ctx = display_lock()) == 0) {}
-
-                display_show(ctx);
-
-
-                graphics_fill_screen(ctx, COLOR_BACKGROUND);
-                graphics_set_color(COLOR_FOREGROUND, 0);
-                text_set_font(FONT_BOLD);
-                text_draw(ctx, 32, 24, "Test", ALIGN_LEFT);
-                text_set_font(FONT_MEDIUM);
-
-                struct controller_data cdata = get_keys_pressed();
-                char buf[128];
-                controller_scan();
-                struct Vec2 v = { 0, 0 };
-                v.x = cdata.c[0].x;
-                v.y = cdata.c[0].y;
-
-                snprintf(buf, sizeof(buf), "%d %d", v.x, v.y);
-                text_draw_wordwrap(ctx, 32, 44, 320-64, buf);
-
-            }
-            break;
+            display_live_ranges();
             current_screen = SCR_MAIN_MENU;
         }
     }
