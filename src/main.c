@@ -176,7 +176,7 @@ int main(void)
                 "Range testing",
                 "Range testing cont.",
                 "Range testing cont.",
-                "Live range testing",
+                "Live range display",
             };
             const int pages = sizeof(page_names) / sizeof(char*);
             int page = 0;
