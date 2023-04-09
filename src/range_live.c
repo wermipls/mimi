@@ -111,8 +111,6 @@ void display_live_ranges() {
 
         struct controller_data cdata = get_keys_pressed();
         char buf[128], lbl_buf[128];
-        snprintf(lbl_buf, sizeof(lbl_buf), "Live range display");
-        text_draw(ctx, 120, 15, lbl_buf, ALIGN_CENTER);
 
         controller_scan();
         struct Vec2 v = { cdata.c[0].x, cdata.c[0].y };
@@ -146,6 +144,9 @@ void display_live_ranges() {
                 0
             );
         }
+
+        snprintf(lbl_buf, sizeof(lbl_buf), "Live range display");
+        text_draw(ctx, 120, 15, lbl_buf, ALIGN_CENTER);
 
         if (show_history == 1) {
             if (count < sz_history) {
