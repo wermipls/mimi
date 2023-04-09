@@ -149,13 +149,18 @@ void display_live_ranges() {
         text_draw(ctx, 120, 15, lbl_buf, ALIGN_CENTER);
 
         if (show_history == 1) {
-            if (count < sz_history) {
-                count++;
+            int history_update = 0;
+            if (v.x != history[0].x || v.y != history[0].y) {
+                history_update = 1;
+                if (count < sz_history) {
+                    count++;
+                }
+
+                history[0] = v;
             }
 
-            history[0] = v;
             for (int i = smin(count, sz_history); i > 0; i--) {
-                history[i] = history[i - 1];
+                if (history_update == 1) history[i] = history[i - 1];
                 uint32_t color = get_comparison_color(0);
                 graphics_draw_pixel_trans(ctx, history[i].x + 120, (history[i].y * -1) + 120, color);
             } 
