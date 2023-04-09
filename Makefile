@@ -35,6 +35,20 @@ $(FS): $(wildcard fs/*) $(wildcard gfx/*)
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_7.png fs/gfx/stick_7.sprite
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/stick_neutral.png fs/gfx/stick_neutral.sprite
 	$(N64_ROOTDIR)/bin/mksprite 32 gfx/point.png fs/gfx/point.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_a.png fs/gfx/btn_a.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_b.png fs/gfx/btn_b.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_l.png fs/gfx/btn_l.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_r.png fs/gfx/btn_r.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_s.png fs/gfx/btn_s.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_z.png fs/gfx/btn_z.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_c_up.png fs/gfx/btn_c_up.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_c_down.png fs/gfx/btn_c_down.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_c_left.png fs/gfx/btn_c_left.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_c_right.png fs/gfx/btn_c_right.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_d_up.png fs/gfx/btn_d_up.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_d_down.png fs/gfx/btn_d_down.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_d_left.png fs/gfx/btn_d_left.sprite
+	$(N64_ROOTDIR)/bin/mksprite 32 gfx/btn_d_right.png fs/gfx/btn_d_right.sprite
 	$(N64_MKDFS) $@ fs
 
 $(BUILD_DIR)/$(NAME).elf: $(OBJS)

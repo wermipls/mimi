@@ -72,6 +72,34 @@ void display_live_ranges() {
     dfs_read(point, size, 1, f);
     dfs_close(f);
     
+    static const char *btn_gfx[] =
+    {
+        "/gfx/btn_a.sprite",
+        "/gfx/btn_b.sprite", 
+        "/gfx/btn_s.sprite",
+        "/gfx/btn_l.sprite",
+        "/gfx/btn_r.sprite",
+        "/gfx/btn_z.sprite",
+        "/gfx/btn_c_up.sprite",
+        "/gfx/btn_c_down.sprite",
+        "/gfx/btn_c_left.sprite",
+        "/gfx/btn_c_right.sprite",
+        "/gfx/btn_d_up.sprite",
+        "/gfx/btn_d_down.sprite",
+        "/gfx/btn_d_left.sprite",
+        "/gfx/btn_d_right.sprite",
+    };
+
+    static sprite_t *btn_sprites[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    for (int i = 0; i < 14; i++) {
+        int f = dfs_open(btn_gfx[i]);
+        int size = dfs_size(f);
+        btn_sprites[i] = malloc(size);
+        dfs_read(btn_sprites[i], size, 1, f);
+        dfs_close(f);
+    }
+
     struct Vec2 history[sz_history];
 
     for (;;) {
@@ -89,7 +117,25 @@ void display_live_ranges() {
         controller_scan();
         struct Vec2 v = { cdata.c[0].x, cdata.c[0].y };
 
+        int btn_x = 240;
+        int btn_y = 160;
+        if (cdata.c[0].A == 1)       graphics_draw_sprite(ctx, btn_x + 0,  btn_y + 0,  btn_sprites[0]);
+        if (cdata.c[0].B == 1)       graphics_draw_sprite(ctx, btn_x + 10, btn_y + 0,  btn_sprites[1]);
+        if (cdata.c[0].start == 1)   graphics_draw_sprite(ctx, btn_x + 20, btn_y + 0,  btn_sprites[2]);
+        if (cdata.c[0].L == 1)       graphics_draw_sprite(ctx, btn_x + 0,  btn_y + 10, btn_sprites[3]);
+        if (cdata.c[0].R == 1)       graphics_draw_sprite(ctx, btn_x + 10, btn_y + 10, btn_sprites[4]);
+        if (cdata.c[0].Z == 1)       graphics_draw_sprite(ctx, btn_x + 20, btn_y + 10, btn_sprites[5]);
+        if (cdata.c[0].C_up == 1)    graphics_draw_sprite(ctx, btn_x + 0,  btn_y + 20, btn_sprites[6]);
+        if (cdata.c[0].C_down == 1)  graphics_draw_sprite(ctx, btn_x + 10, btn_y + 20, btn_sprites[7]);
+        if (cdata.c[0].C_left == 1)  graphics_draw_sprite(ctx, btn_x + 20, btn_y + 20, btn_sprites[8]);
+        if (cdata.c[0].C_right == 1) graphics_draw_sprite(ctx, btn_x + 30, btn_y + 20, btn_sprites[9]);
+        if (cdata.c[0].up == 1)      graphics_draw_sprite(ctx, btn_x + 0,  btn_y + 30, btn_sprites[10]);
+        if (cdata.c[0].down == 1)    graphics_draw_sprite(ctx, btn_x + 10, btn_y + 30, btn_sprites[11]);
+        if (cdata.c[0].left == 1)    graphics_draw_sprite(ctx, btn_x + 20, btn_y + 30, btn_sprites[12]);
+        if (cdata.c[0].right == 1)   graphics_draw_sprite(ctx, btn_x + 30, btn_y + 30, btn_sprites[13]);
+
         snprintf(buf, sizeof(buf), "x: %d\ny: %d", v.x, v.y);
+
         text_draw_wordwrap(ctx, 256, 24, 320-64, buf);
         draw_center_cross(ctx);
         if (current_comparison > 0) {
