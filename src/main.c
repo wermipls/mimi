@@ -14,6 +14,7 @@ enum Screen
     SCR_ABOUT,
     SCR_RANGE_TEST,
     SCR_RANGE_RESULT,
+    SCR_LIVE,
 };
 
 void reset_handler(exception_t *ex)
@@ -61,6 +62,7 @@ int main(void)
                 text_draw(ctx, 32, 24, "mimi git-" ROM_VERSION " (built on " __DATE__ ")", ALIGN_LEFT);
 
                 static const char *options[] = {
+                    "Live range display",
                     "Range test (1 sample)",
                     "Range test (3 samples)",
                     "Range test (5 samples)",
@@ -89,7 +91,7 @@ int main(void)
                 if (cdata.c[0].A) {
                     switch (menu_selection)
                     {
-                    case 0:
+                    case 4:
                         sample_count = 1;
                         current_screen = SCR_RANGE_TEST;
                         break;
@@ -106,10 +108,13 @@ int main(void)
                             current_screen = SCR_RANGE_RESULT;
                         }
                         break;
-                    case 4:
-                        current_screen = SCR_HELP;
+                    case 0:
+                        current_screen = SCR_LIVE;
                         break;
                     case 5:
+                        current_screen = SCR_HELP;
+                        break;
+                    case 6:
                         current_screen = SCR_ABOUT;
                         break;
                     }
@@ -327,6 +332,33 @@ int main(void)
             break;
         case SCR_RANGE_RESULT:
             display_angles(result, sample_count);
+            current_screen = SCR_MAIN_MENU;
+        case SCR_LIVE:
+            text_set_line_height(11);
+            for (;;) {
+                while ((ctx = display_lock()) == 0) {}
+
+                display_show(ctx);
+
+
+                graphics_fill_screen(ctx, COLOR_BACKGROUND);
+                graphics_set_color(COLOR_FOREGROUND, 0);
+                text_set_font(FONT_BOLD);
+                text_draw(ctx, 32, 24, "Test", ALIGN_LEFT);
+                text_set_font(FONT_MEDIUM);
+
+                struct controller_data cdata = get_keys_pressed();
+                char buf[128];
+                controller_scan();
+                struct Vec2 v = { 0, 0 };
+                v.x = cdata.c[0].x;
+                v.y = cdata.c[0].y;
+
+                snprintf(buf, sizeof(buf), "%d %d", v.x, v.y);
+                text_draw_wordwrap(ctx, 32, 44, 320-64, buf);
+
+            }
+            break;
             current_screen = SCR_MAIN_MENU;
         }
     }
