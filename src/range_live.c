@@ -110,7 +110,7 @@ void display_live_ranges() {
             for (int i = smin(count, sz_history); i > 0; i--) {
                 history[i] = history[i - 1];
                 uint32_t color = get_comparison_color(0);
-                graphics_draw_pixel_trans(ctx, history[i].x + 118, (history[i].y * -1) + 118, color);
+                graphics_draw_pixel_trans(ctx, history[i].x + 120, (history[i].y * -1) + 120, color);
             } 
         }
 
