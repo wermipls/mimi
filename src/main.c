@@ -179,6 +179,7 @@ int main(void)
         case SCR_HELP:
             const char *page_names[] = {
                 "Basic controls",
+                "Basic controls cont.",
                 "Range testing",
                 "Range testing cont.",
                 "Range testing cont.",
@@ -235,6 +236,23 @@ int main(void)
                         "* Start - return to main menu\n", ALIGN_LEFT);
                     break;
                 case 1:
+                    text_set_font(FONT_BOLD);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 0), 320-64, 
+                        "On the live range testing screen:\n");
+                    text_set_font(FONT_MEDIUM);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 1), 320-64,
+                        "* Z - toggle history display\n"
+                        "* B - clear history display\n"
+                        "* L/R, D-Pad Left/Right - cycle example ranges\n"
+                        "* Start - return to main menu\n");
+                    text_set_font(FONT_BOLD);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 6), 320-64, 
+                        "On the oscilloscope screen:\n");
+                    text_set_font(FONT_MEDIUM);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 7), 320-64,
+                        "* Start - return to main menu\n");
+                    break;
+                case 2:
                     text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "User can take one or more measurements of the "
                         "analog values. More measurements help even out "
@@ -250,7 +268,7 @@ int main(void)
                         "to judge the controller's range."
                     );
                     break;
-                case 2:
+                case 3:
                     text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "The measurement display can also be overriden with "
                         "one of the example ones, to let user view the expected "
@@ -264,7 +282,7 @@ int main(void)
                         "overriden by user."
                     );
                     break;
-                case 3:
+                case 4:
                     text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "Absolute analog values for each notch are displayed "
                         "on the right of the screen, as well as angles "
@@ -280,38 +298,20 @@ int main(void)
                         "magnitude diagonals on original N64 controllers."
                     );
                     break;
-                case 4:
+                case 5:
                     text_draw_wordwrap(ctx, 32, 44, 320-64, 
                         "Displays live X/Y values on a graph using ideal "
                         "OEM or Hori values as an overlay. Displays "
-                        "the most recent 1,024 values in blue, and the "
-                        "current X/Y values as integers. Shows icons "
-                        "indicating which buttons are being pressed.\n\n"
+                        "the most recent 1024 values in blue, and the "
+                        "current X/Y values as integers.\n\n"
                     );
-
-                    text_set_font(FONT_BOLD);
-                    text_draw_wordwrap(ctx, 32, 44 + (11 * 6), 320-64, 
-                        "On the live range testing screen:\n");
-                    text_set_font(FONT_MEDIUM);
-                    text_draw_wordwrap(ctx, 32, 44 + (11 * 7), 320-64,
-                        "* Z - toggle history display\n"
-                        "* B - clear history display\n"
-                        "* Start - return to main menu\n"
-                        "* L/R, D-Pad Left/Right - cycle example ranges\n");
                     break;
-                case 5:
+                case 6:
                     text_draw_wordwrap(ctx, 32, 44, 320-64, 
                         "Displays live X/Y values on an oscilloscope-style "
                         "display. Useful for identifying skips and "
                         "snapback issues.\n\n"
                     );
-
-                    text_set_font(FONT_BOLD);
-                    text_draw_wordwrap(ctx, 32, 44 + (11 * 4), 320-64, 
-                        "On the oscilloscope screen:\n");
-                    text_set_font(FONT_MEDIUM);
-                    text_draw_wordwrap(ctx, 32, 44 + (11 * 5), 320-64,
-                        "* Start - return to main menu\n");
                     break;
                 }
 
