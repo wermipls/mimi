@@ -129,7 +129,10 @@ void display_live_ranges() {
         cdata = get_keys_down_filtered();
         if (cdata.c[0].Z) {
             show_history = abs(show_history - 1);
-            if (show_history == 0) count = 0;
+        }
+
+        if (cdata.c[0].B) {
+            count = 0;
         }
 
         text_set_font(FONT_MEDIUM);

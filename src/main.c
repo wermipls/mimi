@@ -295,8 +295,9 @@ int main(void)
                     text_set_font(FONT_MEDIUM);
                     text_draw_wordwrap(ctx, 32, 44 + (11 * 7), 320-64,
                         "* Z - toggle history display\n"
+                        "* B - clear history display\n"
                         "* Start - return to main menu\n"
-                        "* D-Pad Left/Right - cycle example ranges\n");
+                        "* L/R, D-Pad Left/Right - cycle example ranges\n");
                     break;
                 case 5:
                     text_draw_wordwrap(ctx, 32, 44, 320-64, 
