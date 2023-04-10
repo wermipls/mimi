@@ -79,11 +79,11 @@ void display_live_ranges() {
 
         snprintf(buf, sizeof(buf), "x\ny");
         text_set_font(FONT_MEDIUM);
-        text_draw(ctx, 270, 15, buf, ALIGN_LEFT);
+        text_draw(ctx, 270, 120 - line_height, buf, ALIGN_LEFT);
 
         text_set_font(FONT_BOLD);
         snprintf(buf, sizeof(buf), "%3d\n%3d", v.x, v.y);
-        text_draw(ctx, 263, 15, buf, ALIGN_RIGHT);
+        text_draw(ctx, 263, 120 - line_height, buf, ALIGN_RIGHT);
 
         draw_center_cross(ctx);
         if (current_comparison > 0) {
