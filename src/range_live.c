@@ -193,4 +193,9 @@ void display_live_ranges() {
     }
 
     free(point);
+
+    for (int i = 0; i < 14; i++) {
+        free(btn_sprites[i]);
+    }
+
 }
