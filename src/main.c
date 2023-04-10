@@ -4,6 +4,7 @@
 
 #include "range_test.h"
 #include "range_live.h"
+#include "oscilloscope.h"
 #include "text.h"
 #include "colors.h"
 #include "input.h"
@@ -16,6 +17,7 @@ enum Screen
     SCR_RANGE_TEST,
     SCR_RANGE_RESULT,
     SCR_LIVE,
+    SCR_OSCOPE,
 };
 
 void reset_handler(exception_t *ex)
@@ -68,6 +70,7 @@ int main(void)
                     "Range test (5 samples)",
                     "Display last range result",
                     "Live range display",
+                    "Oscilloscope display",
                     "Help",
                     "About",
                 };
@@ -113,9 +116,12 @@ int main(void)
                         current_screen = SCR_LIVE;
                         break;
                     case 5:
-                        current_screen = SCR_HELP;
+                        current_screen = SCR_OSCOPE;
                         break;
                     case 6:
+                        current_screen = SCR_HELP;
+                        break;
+                    case 7:
                         current_screen = SCR_ABOUT;
                         break;
                     }
@@ -177,6 +183,7 @@ int main(void)
                 "Range testing cont.",
                 "Range testing cont.",
                 "Live range display",
+                "Oscilloscope display",
             };
             const int pages = sizeof(page_names) / sizeof(char*);
             int page = 0;
@@ -291,6 +298,20 @@ int main(void)
                         "* Start - return to main menu\n"
                         "* D-Pad Left/Right - cycle example ranges\n");
                     break;
+                case 5:
+                    text_draw_wordwrap(ctx, 32, 44, 320-64, 
+                        "Displays live X/Y values on an oscilloscope-style "
+                        "display. Useful for identifying skips and "
+                        "snapback issues.\n\n"
+                    );
+
+                    text_set_font(FONT_BOLD);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 4), 320-64, 
+                        "On the oscilloscope screen:\n");
+                    text_set_font(FONT_MEDIUM);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 5), 320-64,
+                        "* Start - return to main menu\n");
+                    break;
                 }
 
 
@@ -355,6 +376,9 @@ int main(void)
             current_screen = SCR_MAIN_MENU;
         case SCR_LIVE:
             display_live_ranges();
+            current_screen = SCR_MAIN_MENU;
+        case SCR_OSCOPE:
+            display_oscilloscope();
             current_screen = SCR_MAIN_MENU;
         }
     }
