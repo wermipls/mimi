@@ -41,7 +41,7 @@ void display_oscilloscope() {
         for (int i = count; i > 0; i--) {
             history[i] = history[i - 1];
             draw_aa_line(ctx, sz_history - i, 80, sz_history - i, 80 + history[i].x * zoom, c_blue);
-            draw_aa_line(ctx, sz_history - i, 180, sz_history - i, 180 + history[i].y * zoom, c_green);
+            draw_aa_line(ctx, sz_history - i, 180, sz_history - i, 180 + (history[i].y * -1) * zoom, c_green);
         }
 
         history[0] = v;
