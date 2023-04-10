@@ -30,8 +30,8 @@ void display_oscilloscope() {
         graphics_fill_screen(ctx, COLOR_BACKGROUND);
         graphics_set_color(COLOR_FOREGROUND, 0);
 
-        struct controller_data cdata = get_keys_pressed();
         controller_scan();
+        struct controller_data cdata = get_keys_pressed();
 
         struct Vec2 v = { cdata.c[0].x, cdata.c[0].y };
         if (count < sz_history - 1) {
