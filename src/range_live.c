@@ -132,9 +132,14 @@ void display_live_ranges() {
         if (cdata.c[0].left == 1)    graphics_draw_sprite(ctx, btn_x + 20, btn_y + 30, btn_sprites[12]);
         if (cdata.c[0].right == 1)   graphics_draw_sprite(ctx, btn_x + 30, btn_y + 30, btn_sprites[13]);
 
-        snprintf(buf, sizeof(buf), "x: %d\ny: %d", v.x, v.y);
+        snprintf(buf, sizeof(buf), "x\ny");
+        text_set_font(FONT_MEDIUM);
+        text_draw(ctx, 270, 15, buf, ALIGN_LEFT);
 
-        text_draw_wordwrap(ctx, 256, 24, 320-64, buf);
+        text_set_font(FONT_BOLD);
+        snprintf(buf, sizeof(buf), "%3d\n%3d", v.x, v.y);
+        text_draw(ctx, 263, 15, buf, ALIGN_RIGHT);
+
         draw_center_cross(ctx);
         if (current_comparison > 0) {
             draw_stick_angles(
