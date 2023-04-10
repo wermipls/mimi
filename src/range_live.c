@@ -111,7 +111,7 @@ void display_live_ranges() {
 
             for (int i = count; i > 0; i--) {
                 if (history_update == 1) history[i] = history[i - 1];
-                graphics_draw_pixel_trans(
+                graphics_draw_pixel(
                     ctx, 
                     history[i].x + 120, 
                     (history[i].y * -1) + 120, 
