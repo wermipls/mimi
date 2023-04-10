@@ -43,19 +43,6 @@ struct StickAngles *live_comparisons[] = {
     &live_compare_hori,
 };
 
-uint32_t get_comparison_color(int comparison) {
-    switch (comparison) {
-        case 0:
-            return graphics_make_color(0, 192, 255, 255);
-        case 1:
-            return graphics_make_color(64, 255, 0, 255);
-        case 2:
-            return graphics_make_color(255, 0, 192, 255);
-
-    }
-    return graphics_make_color(64, 64, 64, 255);
-}
-
 void display_live_ranges() {
     int count = 0, 
         line_height = 11,
@@ -73,6 +60,9 @@ void display_live_ranges() {
     dfs_close(f);
 
     struct Vec2 history[sz_history];
+
+    uint32_t comparison_color = graphics_make_color(64, 255, 0, 255),
+             history_color = graphics_make_color(0, 192, 255, 255);
 
     for (;;) {
         while ((ctx = display_lock()) == 0) {}
@@ -100,7 +90,7 @@ void display_live_ranges() {
             draw_stick_angles(
                 ctx, 
                 *live_comparisons[current_comparison], 
-                get_comparison_color(current_comparison), 
+                comparison_color,
                 0
             );
         }
@@ -121,8 +111,12 @@ void display_live_ranges() {
 
             for (int i = count; i > 0; i--) {
                 if (history_update == 1) history[i] = history[i - 1];
-                uint32_t color = get_comparison_color(0);
-                graphics_draw_pixel_trans(ctx, history[i].x + 120, (history[i].y * -1) + 120, color);
+                graphics_draw_pixel_trans(
+                    ctx, 
+                    history[i].x + 120, 
+                    (history[i].y * -1) + 120, 
+                    history_color
+                );
             } 
         }
 
