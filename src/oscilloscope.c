@@ -13,9 +13,10 @@
 void display_oscilloscope() {
     int line_height = 11,
         sz_history = 240,
+        plot_offset = 24,
         count = 0;
 
-    float zoom = 0.5;
+    float zoom = 0.4;
     uint32_t c_blue = graphics_make_color(0, 192, 255, 255);
     uint32_t c_green = graphics_make_color(64, 255, 0, 255);
     struct Vec2 history[sz_history];
@@ -40,21 +41,61 @@ void display_oscilloscope() {
 
         for (int i = count; i > 0; i--) {
             history[i] = history[i - 1];
-            graphics_draw_line(ctx, sz_history - i, 80, sz_history - i, 80 + history[i].x * zoom, c_blue);
-            graphics_draw_line(ctx, sz_history - i, 180, sz_history - i, 180 + (history[i].y * -1) * zoom, c_green);
+            graphics_draw_line(
+                ctx, 
+                plot_offset + sz_history - i, 
+                80, 
+                plot_offset + sz_history - i, 
+                80 + history[i].x * zoom, 
+                c_blue
+            );
+            graphics_draw_line(
+                ctx, 
+                plot_offset + sz_history - i, 
+                180, 
+                plot_offset + sz_history - i, 
+                180 + (history[i].y * -1) * zoom, 
+                c_green
+            );
         }
 
         history[0] = v;
+        graphics_draw_line(
+            ctx, 
+            plot_offset + sz_history, 
+            80, 
+            plot_offset + sz_history, 
+            80 + v.x * zoom, 
+            c_blue
+        );
+        graphics_draw_line(
+            ctx, 
+            plot_offset + sz_history, 
+            180, 
+            plot_offset + sz_history, 
+            180 + (v.y * -1) * zoom, 
+            c_green
+        );
 
-        char buf[128], lbl_buf[128];
-        snprintf(buf, sizeof(buf), "x: %d", v.x);
-        text_draw_wordwrap(ctx, 256, 74, 320-64, buf);
+        char buf[128];
 
-        snprintf(buf, sizeof(buf), "y: %d", v.y);
-        text_draw_wordwrap(ctx, 256, 174, 320-64, buf);
+        text_set_font(FONT_BOLD);
+        snprintf(buf, sizeof(buf), "%3d", v.x);
+        text_draw(ctx, 293, 74, buf, ALIGN_RIGHT);
 
-        snprintf(lbl_buf, sizeof(lbl_buf), "Oscilloscope display");
-        text_draw(ctx, 20, 15, lbl_buf, ALIGN_LEFT);
+        snprintf(buf, sizeof(buf), "%3d", v.x);
+        text_draw(ctx, 293, 174, buf, ALIGN_RIGHT);
+
+        text_set_font(FONT_MEDIUM);
+        snprintf(buf, sizeof(buf), "x");
+        text_draw(ctx, 300, 74, buf, ALIGN_LEFT);
+
+        snprintf(buf, sizeof(buf), "y");
+        text_draw(ctx, 300, 174, buf, ALIGN_LEFT);
+
+
+        snprintf(buf, sizeof(buf), "Oscilloscope display");
+        text_draw(ctx, 160, 15, buf, ALIGN_CENTER);
 
         text_set_font(FONT_MEDIUM);
         graphics_set_color(graphics_make_color(128, 128, 128, 255), 0);
