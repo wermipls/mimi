@@ -35,13 +35,10 @@ void display_oscilloscope() {
         struct controller_data cdata = get_keys_pressed();
 
         struct Vec2 v = { cdata.c[0].x, cdata.c[0].y };
-        if (count < sz_history - 1) {
-            count++;
-        }
 
         for (int i = count; i > 0; i--) {
             history[i] = history[i - 1];
-            graphics_draw_line(
+            draw_aa_line(
                 ctx, 
                 plot_offset + sz_history - i, 
                 80, 
@@ -49,7 +46,7 @@ void display_oscilloscope() {
                 80 + history[i].x * zoom, 
                 c_blue
             );
-            graphics_draw_line(
+            draw_aa_line(
                 ctx, 
                 plot_offset + sz_history - i, 
                 180, 
@@ -60,7 +57,7 @@ void display_oscilloscope() {
         }
 
         history[0] = v;
-        graphics_draw_line(
+        draw_aa_line(
             ctx, 
             plot_offset + sz_history, 
             80, 
@@ -68,7 +65,7 @@ void display_oscilloscope() {
             80 + v.x * zoom, 
             c_blue
         );
-        graphics_draw_line(
+        draw_aa_line(
             ctx, 
             plot_offset + sz_history, 
             180, 
@@ -76,6 +73,10 @@ void display_oscilloscope() {
             180 + (v.y * -1) * zoom, 
             c_green
         );
+
+        if (count < sz_history - 1) {
+            count++;
+        }
 
         char buf[128];
 
