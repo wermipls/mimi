@@ -43,6 +43,18 @@ struct StickAngles *live_comparisons[] = {
     &live_compare_hori,
 };
 
+char * get_comparison_str(int current_comparison) {
+    switch (current_comparison) {
+        case 0:
+            return "";
+        case 1:
+            return ", ideal OEM comparison";
+        case 2:
+            return ", ideal Hori Minipad comparison";
+    }
+    return "";
+}
+
 void display_live_ranges() {
     int count = 0, 
         line_height = 11,
@@ -55,6 +67,7 @@ void display_live_ranges() {
 
     int f = dfs_open("/gfx/point.sprite");
     int size = dfs_size(f);
+    char * comparison_str = "";
     sprite_t *point = malloc(size);
     dfs_read(point, size, 1, f);
     dfs_close(f);
@@ -95,8 +108,8 @@ void display_live_ranges() {
             );
         }
 
-        snprintf(buf, sizeof(buf), "Live range display");
-        text_draw(ctx, 120, 15, buf, ALIGN_CENTER);
+        snprintf(buf, sizeof(buf), "Live range display%s", comparison_str);
+        text_draw(ctx, 160, 15, buf, ALIGN_CENTER);
 
         if (show_history == 1) {
             int history_update = 0;
@@ -111,16 +124,15 @@ void display_live_ranges() {
 
             for (int i = count; i > 0; i--) {
                 if (history_update == 1) history[i] = history[i - 1];
-                graphics_draw_pixel(
-                    ctx, 
-                    history[i].x + 120, 
-                    (history[i].y * -1) + 120, 
-                    history_color
-                );
+                int x = smax(0, smin(320, history[i].x + 120));
+                int y = smax(0, smin(240, (history[i].y * -1) + 120));
+                graphics_draw_pixel( ctx, x, y, history_color);
             } 
         }
 
-        graphics_draw_sprite(ctx, v.x + 118, (v.y * -1) + 118, point);
+        int x = smax(0, smin(320, v.x + 118));
+        int y = smax(0, smin(240, (v.y * -1) + 118));
+        graphics_draw_sprite(ctx, x, y, point);
 
         if (cdata.c[0].start) {
             break;
@@ -142,10 +154,12 @@ void display_live_ranges() {
         if (cdata.c[0].left || cdata.c[0].L) {
             current_comparison--;
             if (current_comparison < 0) current_comparison += comparison_count;
+            comparison_str = get_comparison_str(current_comparison);
         }
 
         if (cdata.c[0].right || cdata.c[0].R) {
             current_comparison = (current_comparison + 1) % comparison_count;
+            comparison_str = get_comparison_str(current_comparison);
         }
     }
 
