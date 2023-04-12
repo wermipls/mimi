@@ -67,7 +67,7 @@ const char *example_names[] =
     "Ideal Horipad Mini example",
 };
 
-void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t color, int zoomout)
+void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t color, int zoomout, int x)
 {
     if (zoomout) {
         for (int i = 0; i < 16; i++) {
@@ -81,24 +81,25 @@ void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t col
         int j = (i + 1) % 8;
         draw_aa_line(
             ctx, 
-            120 + v[i].x, 
+              x + v[i].x,
             120 - v[i].y, 
-            120 + v[j].x,
+              x + v[j].x,
             120 - v[j].y,
             color);
     }
 }
 
-void draw_center_cross(display_context_t ctx)
+void draw_center_cross(display_context_t ctx, int x_origin)
 {
-    int x, y;
+    int x, y, offset;
     y = 120;
-    for (x = 0; x < 240; x++) {
-        int i = smin(240 - abs(240 - x * 2), 120);
+    offset = x_origin - 120;
+    for (x = offset; x < 240+offset; x++) {
+        int i = smin(240 - abs(240 - (x-offset)*2), 120);
         graphics_draw_pixel_trans(ctx, x, y, graphics_make_color(255, 255, 255, i));
     }
 
-    x = 120;
+    x = x_origin;
     for (y = 0; y < 240; y++) {
         int i = smin(240 - abs(240 - y * 2), 120);
         graphics_draw_pixel_trans(ctx, x, y, graphics_make_color(255, 255, 255, i));
@@ -382,6 +383,7 @@ void display_angles(struct StickAngles a[], int sample_count)
 
     struct StickAngles median = find_median(a, sample_count);
     int zoomout = should_enable_zoomout(a, sample_count);
+    int x_origin = 120;
 
     text_set_line_height(10);
     for (;;) {
@@ -389,12 +391,12 @@ void display_angles(struct StickAngles a[], int sample_count)
 
         graphics_fill_screen(ctx, COLOR_BACKGROUND);
 
-        draw_center_cross(ctx);
+        draw_center_cross(ctx, x_origin);
         for (int i = 0; i < sample_count; i++) {
-            draw_stick_angles(ctx, a[i], c_gray, zoomout);
+            draw_stick_angles(ctx, a[i], c_gray, zoomout, x_origin);
         }
         if (comparisons[current_comparison]) {
-            draw_stick_angles(ctx, *comparisons[current_comparison], c_green, zoomout);
+            draw_stick_angles(ctx, *comparisons[current_comparison], c_green, zoomout, x_origin);
         }
 
         struct StickAngles *current;
@@ -410,7 +412,7 @@ void display_angles(struct StickAngles a[], int sample_count)
             c_current = c_blue;
         }
 
-        draw_stick_angles(ctx, *current, c_current, zoomout);
+        draw_stick_angles(ctx, *current, c_current, zoomout, x_origin);
         print_stick_angles(ctx, *current);
         
         graphics_set_color(COLOR_FOREGROUND, 0);
