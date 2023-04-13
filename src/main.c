@@ -241,15 +241,16 @@ int main(void)
                         "On the live range testing screen:\n");
                     text_set_font(FONT_MEDIUM);
                     text_draw_wordwrap(ctx, 32, 44 + (11 * 1), 320-64,
-                        "* Z - toggle history display\n"
+                        "* A - toggle history display\n"
                         "* B - clear history display\n"
+                        "* Z - change zoom\n"
                         "* L/R, D-Pad Left/Right - cycle example ranges\n"
                         "* Start - return to main menu\n");
                     text_set_font(FONT_BOLD);
-                    text_draw_wordwrap(ctx, 32, 44 + (11 * 6), 320-64, 
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 7), 320-64, 
                         "On the oscilloscope screen:\n");
                     text_set_font(FONT_MEDIUM);
-                    text_draw_wordwrap(ctx, 32, 44 + (11 * 7), 320-64,
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 8), 320-64,
                         "* Start - return to main menu\n");
                     break;
                 case 2:

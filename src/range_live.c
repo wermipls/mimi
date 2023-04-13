@@ -59,7 +59,9 @@ void display_live_ranges() {
         show_history = 1,
         sz_history = 1024,
         current_comparison = 1,
-        comparison_count = sizeof(live_comparisons) / sizeof(0);
+        comparison_count = sizeof(live_comparisons) / sizeof(0),
+        zoomout = 0;
+    float zoomout_factor = 1;
     text_set_line_height(line_height);
     display_context_t ctx;
 
@@ -102,7 +104,7 @@ void display_live_ranges() {
                 ctx,
                 *live_comparisons[current_comparison],
                 comparison_color,
-                0,
+                zoomout,
                 160
             );
         }
@@ -120,14 +122,14 @@ void display_live_ranges() {
 
             for (int i = count; i > 0; i--) {
                 if (history_update == 1) history[i] = history[i - 1];
-                int x = smax(0, smin(320, history[i].x + 160));
-                int y = smax(0, smin(240, (history[i].y * -1) + 120));
+                int x = smax(0, smin(320, (history[i].x * zoomout_factor) + 160));
+                int y = smax(0, smin(240, ((history[i].y * zoomout_factor) * -1) + 120));
                 graphics_draw_pixel(ctx, x, y, history_color);
             }
         }
 
-        int x = smax(0, smin(320, v.x + 158));
-        int y = smax(0, smin(240, (v.y * -1) + 118));
+        int x = smax(0, smin(320, (v.x * zoomout_factor) + 158));
+        int y = smax(0, smin(240, ((v.y * zoomout_factor) * -1) + 118));
         graphics_draw_sprite(ctx, x, y, point);
 
         if (cdata.c[0].start) {
@@ -135,17 +137,18 @@ void display_live_ranges() {
         }
 
         cdata = get_keys_down_filtered();
-        if (cdata.c[0].Z) {
-            show_history = abs(show_history - 1);
+        if (cdata.c[0].A) {
+            show_history ^= 1;
         }
 
         if (cdata.c[0].B) {
             count = 0;
         }
 
-        text_set_font(FONT_MEDIUM);
-        graphics_set_color(graphics_make_color(128, 128, 128, 255), 0);
-        text_draw(ctx, 320 - 16, 213, REPO_URL, ALIGN_RIGHT);
+        if (cdata.c[0].Z) {
+            zoomout ^= 1;
+            zoomout_factor = (zoomout == 0) ? 1 : 0.75;
+        }
 
         if (cdata.c[0].left || cdata.c[0].L) {
             current_comparison--;
@@ -161,6 +164,14 @@ void display_live_ranges() {
         text_set_font(FONT_MEDIUM);
         snprintf(buf, sizeof(buf), "%s", title_str);
         text_draw(ctx, 160, 15, buf, ALIGN_CENTER);
+
+        if (zoomout) {
+            text_draw(ctx, 16, 213, "75\% scale", ALIGN_LEFT);
+        }
+
+        text_set_font(FONT_MEDIUM);
+        graphics_set_color(graphics_make_color(128, 128, 128, 255), 0);
+        text_draw(ctx, 320 - 16, 213, REPO_URL, ALIGN_RIGHT);
     }
 
     free(point);
