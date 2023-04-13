@@ -41,17 +41,17 @@ void display_oscilloscope() {
             draw_aa_line(
                 ctx, 
                 plot_offset + sz_history - i, 
-                80, 
+                70, 
                 plot_offset + sz_history - i, 
-                80 + history[i].x * zoom, 
+                70 + history[i].x * zoom, 
                 c_blue
             );
             draw_aa_line(
                 ctx, 
                 plot_offset + sz_history - i, 
-                180, 
+                170, 
                 plot_offset + sz_history - i, 
-                180 + (history[i].y * -1) * zoom, 
+                170 + (history[i].y * -1) * zoom, 
                 c_green
             );
         }
@@ -60,17 +60,17 @@ void display_oscilloscope() {
         draw_aa_line(
             ctx, 
             plot_offset + sz_history, 
-            80, 
+            70, 
             plot_offset + sz_history, 
-            80 + v.x * zoom, 
+            70 + v.x * zoom, 
             c_blue
         );
         draw_aa_line(
             ctx, 
             plot_offset + sz_history, 
-            180, 
+            170, 
             plot_offset + sz_history, 
-            180 + (v.y * -1) * zoom, 
+            170 + (v.y * -1) * zoom, 
             c_green
         );
 
@@ -82,17 +82,17 @@ void display_oscilloscope() {
 
         text_set_font(FONT_BOLD);
         snprintf(buf, sizeof(buf), "%3d", v.x);
-        text_draw(ctx, 293, 74, buf, ALIGN_RIGHT);
+        text_draw(ctx, 293, 64, buf, ALIGN_RIGHT);
 
         snprintf(buf, sizeof(buf), "%3d", v.x);
-        text_draw(ctx, 293, 174, buf, ALIGN_RIGHT);
+        text_draw(ctx, 293, 164, buf, ALIGN_RIGHT);
 
         text_set_font(FONT_MEDIUM);
         snprintf(buf, sizeof(buf), "x");
-        text_draw(ctx, 300, 74, buf, ALIGN_LEFT);
+        text_draw(ctx, 300, 64, buf, ALIGN_LEFT);
 
         snprintf(buf, sizeof(buf), "y");
-        text_draw(ctx, 300, 174, buf, ALIGN_LEFT);
+        text_draw(ctx, 300, 164, buf, ALIGN_LEFT);
 
 
         snprintf(buf, sizeof(buf), "Oscilloscope display");
