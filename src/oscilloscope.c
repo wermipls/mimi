@@ -12,8 +12,13 @@
 
 void display_oscilloscope() {
     int line_height = 11,
-        sz_history = 240,
-        plot_offset = 24,
+        sz_history = 230,
+        x_offset = 24,
+        y_offset1 = 70,
+        y_offset2 = 170,
+        lbl_x_offset = 282,
+        lbl_y_offset1 = y_offset1 - (line_height / 2),
+        lbl_y_offset2 = y_offset2 - (line_height / 2),
         count = 0;
 
     float zoom = 0.4;
@@ -39,38 +44,38 @@ void display_oscilloscope() {
         for (int i = count; i > 0; i--) {
             history[i] = history[i - 1];
             draw_aa_line(
-                ctx, 
-                plot_offset + sz_history - i, 
-                70, 
-                plot_offset + sz_history - i, 
-                70 + history[i].x * zoom, 
+                ctx,
+                x_offset + sz_history - i,
+                y_offset1,
+                x_offset + sz_history - i,
+                y_offset1 + history[i].x * zoom,
                 c_blue
             );
             draw_aa_line(
-                ctx, 
-                plot_offset + sz_history - i, 
-                170, 
-                plot_offset + sz_history - i, 
-                170 + (history[i].y * -1) * zoom, 
+                ctx,
+                x_offset + sz_history - i,
+                y_offset2,
+                x_offset + sz_history - i,
+                y_offset2 + (history[i].y * -1) * zoom,
                 c_green
             );
         }
 
         history[0] = v;
         draw_aa_line(
-            ctx, 
-            plot_offset + sz_history, 
-            70, 
-            plot_offset + sz_history, 
-            70 + v.x * zoom, 
+            ctx,
+            x_offset + sz_history,
+            y_offset1,
+            x_offset + sz_history,
+            y_offset1 + v.x * zoom,
             c_blue
         );
         draw_aa_line(
-            ctx, 
-            plot_offset + sz_history, 
-            170, 
-            plot_offset + sz_history, 
-            170 + (v.y * -1) * zoom, 
+            ctx,
+            x_offset + sz_history,
+            y_offset2,
+            x_offset + sz_history,
+            y_offset2 + (v.y * -1) * zoom,
             c_green
         );
 
@@ -82,17 +87,17 @@ void display_oscilloscope() {
 
         text_set_font(FONT_BOLD);
         snprintf(buf, sizeof(buf), "%3d", v.x);
-        text_draw(ctx, 293, 64, buf, ALIGN_RIGHT);
+        text_draw(ctx, lbl_x_offset, lbl_y_offset1, buf, ALIGN_RIGHT);
 
-        snprintf(buf, sizeof(buf), "%3d", v.x);
-        text_draw(ctx, 293, 164, buf, ALIGN_RIGHT);
+        snprintf(buf, sizeof(buf), "%3d", v.y);
+        text_draw(ctx, lbl_x_offset, lbl_y_offset2, buf, ALIGN_RIGHT);
 
         text_set_font(FONT_MEDIUM);
         snprintf(buf, sizeof(buf), "x");
-        text_draw(ctx, 300, 64, buf, ALIGN_LEFT);
+        text_draw(ctx, lbl_x_offset + 8, lbl_y_offset1, buf, ALIGN_LEFT);
 
         snprintf(buf, sizeof(buf), "y");
-        text_draw(ctx, 300, 164, buf, ALIGN_LEFT);
+        text_draw(ctx, lbl_x_offset + 8, lbl_y_offset2, buf, ALIGN_LEFT);
 
 
         snprintf(buf, sizeof(buf), "Oscilloscope display");
