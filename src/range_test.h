@@ -21,3 +21,5 @@ struct StickAngles
 
 void test_angles(struct StickAngles *a, int testnum);
 void display_angles(struct StickAngles a[], int sample_count);
+void draw_center_cross(display_context_t ctx, int x_origin);
+void draw_stick_angles(display_context_t ctx, struct StickAngles a, uint32_t color, int zoomout, int x);

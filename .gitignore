@@ -2,3 +2,4 @@ build/
 .tmp/
 *.z64
 fs/gfx/*.sprite
+.*.sw*

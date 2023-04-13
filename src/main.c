@@ -3,6 +3,8 @@
 #include <stdlib.h>
 
 #include "range_test.h"
+#include "range_live.h"
+#include "oscilloscope.h"
 #include "text.h"
 #include "colors.h"
 #include "input.h"
@@ -14,6 +16,8 @@ enum Screen
     SCR_ABOUT,
     SCR_RANGE_TEST,
     SCR_RANGE_RESULT,
+    SCR_LIVE,
+    SCR_OSCOPE,
 };
 
 void reset_handler(exception_t *ex)
@@ -65,6 +69,8 @@ int main(void)
                     "Range test (3 samples)",
                     "Range test (5 samples)",
                     "Display last range result",
+                    "Live range display",
+                    "Oscilloscope display",
                     "Help",
                     "About",
                 };
@@ -107,9 +113,15 @@ int main(void)
                         }
                         break;
                     case 4:
-                        current_screen = SCR_HELP;
+                        current_screen = SCR_LIVE;
                         break;
                     case 5:
+                        current_screen = SCR_OSCOPE;
+                        break;
+                    case 6:
+                        current_screen = SCR_HELP;
+                        break;
+                    case 7:
                         current_screen = SCR_ABOUT;
                         break;
                     }
@@ -167,9 +179,12 @@ int main(void)
         case SCR_HELP:
             const char *page_names[] = {
                 "Basic controls",
+                "Basic controls cont.",
                 "Range testing",
                 "Range testing cont.",
                 "Range testing cont.",
+                "Live range display",
+                "Oscilloscope display",
             };
             const int pages = sizeof(page_names) / sizeof(char*);
             int page = 0;
@@ -221,6 +236,24 @@ int main(void)
                         "* Start - return to main menu\n", ALIGN_LEFT);
                     break;
                 case 1:
+                    text_set_font(FONT_BOLD);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 0), 320-64, 
+                        "On the live range testing screen:\n");
+                    text_set_font(FONT_MEDIUM);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 1), 320-64,
+                        "* A - toggle history display\n"
+                        "* B - clear history display\n"
+                        "* Z - change zoom\n"
+                        "* L/R, D-Pad Left/Right - cycle example ranges\n"
+                        "* Start - return to main menu\n");
+                    text_set_font(FONT_BOLD);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 7), 320-64, 
+                        "On the oscilloscope screen:\n");
+                    text_set_font(FONT_MEDIUM);
+                    text_draw_wordwrap(ctx, 32, 44 + (11 * 8), 320-64,
+                        "* Start - return to main menu\n");
+                    break;
+                case 2:
                     text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "User can take one or more measurements of the "
                         "analog values. More measurements help even out "
@@ -236,7 +269,7 @@ int main(void)
                         "to judge the controller's range."
                     );
                     break;
-                case 2:
+                case 3:
                     text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "The measurement display can also be overriden with "
                         "one of the example ones, to let user view the expected "
@@ -250,7 +283,7 @@ int main(void)
                         "overriden by user."
                     );
                     break;
-                case 3:
+                case 4:
                     text_draw_wordwrap(ctx, 32, 44, 320-64,
                         "Absolute analog values for each notch are displayed "
                         "on the right of the screen, as well as angles "
@@ -264,6 +297,21 @@ int main(void)
                         "The diagonal magnitude cutoffs are 9/8th times "
                         "the cardinal ones to compensate for higher "
                         "magnitude diagonals on original N64 controllers."
+                    );
+                    break;
+                case 5:
+                    text_draw_wordwrap(ctx, 32, 44, 320-64, 
+                        "Displays live X/Y values on a graph using ideal "
+                        "OEM or Hori values as an overlay. Displays "
+                        "the most recent 1024 values in blue, and the "
+                        "current X/Y values as integers.\n\n"
+                    );
+                    break;
+                case 6:
+                    text_draw_wordwrap(ctx, 32, 44, 320-64, 
+                        "Displays live X/Y values on an oscilloscope-style "
+                        "display. Useful for identifying skips and "
+                        "snapback issues.\n\n"
                     );
                     break;
                 }
@@ -327,6 +375,12 @@ int main(void)
             break;
         case SCR_RANGE_RESULT:
             display_angles(result, sample_count);
+            current_screen = SCR_MAIN_MENU;
+        case SCR_LIVE:
+            display_live_ranges();
+            current_screen = SCR_MAIN_MENU;
+        case SCR_OSCOPE:
+            display_oscilloscope();
             current_screen = SCR_MAIN_MENU;
         }
     }
