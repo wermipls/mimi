@@ -22,7 +22,7 @@ On the help screen:
 On the range test result screen:
 * L/R - switch between range comparisons
 * D-Pad Up/Down - switch between measurements
-* D-Pad Left/Right - switch between example ranges and result measurements\n"
+* D-Pad Left/Right - switch between example ranges and result measurements
 * Z - change zoom
 * Start - return to main menu
 
